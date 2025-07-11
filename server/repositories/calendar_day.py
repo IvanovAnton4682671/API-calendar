@@ -4,7 +4,7 @@ from models.calendar_day import CalendarDay
 from typing import Optional
 from schemas.calendar_day import CalendarDayInDB
 import datetime
-from sqlalchemy import select, update
+from sqlalchemy import select
 
 logger = setup_logger("repositories.calendar_day")
 
@@ -38,7 +38,7 @@ class CalendarDayRepository:
         except Exception as e:
             logger.error(f"При создании календарного дня произошла ошибка: {str(e)}", exc_info=True)
             await self._session.rollback()
-            raise
+            return None
 
     async def get_day_by_date(self, date: datetime.date) -> Optional[CalendarDay]:
         """
@@ -46,26 +46,26 @@ class CalendarDayRepository:
         """
 
         try:
-            logger.info(f"Пробуем получить день по date={date}")
+            logger.info(f"Пробуем получить день date={date}")
             query = select(CalendarDay).where(CalendarDay.date == date)
             result = await self._session.execute(query)
             received_day = result.scalars().first()
             if received_day:
-                logger.info(f"Календарный день успешно получен: {received_day}")
+                logger.info(f"Календарный день date={date} успешно получен: {received_day}")
                 return received_day
-            logger.warning("При получении дня что-то пошло не так")
+            logger.warning(f"При получении календарного дня date={date} что-то пошло не так")
             return None
         except Exception as e:
-            logger.error(f"При получении календарного дня произошла ошибка: {str(e)}", exc_info=True)
-            raise
+            logger.error(f"При получении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
+            return None
 
     async def update_day(self, date: datetime.date, day_data: CalendarDay) -> Optional[CalendarDayInDB]:
         """
-        ### Обновляет календарный день, полученный по date
+        ### Обновляет календарный день по date
         """
 
         try:
-            logger.info(f"Пробуем обновить день date={date} данными: {day_data}")
+            logger.info(f"Пробуем обновить календарный день date={date} данными: {day_data}")
             received_day = await self.get_day_by_date(date)
             if received_day:
                 received_day.date = day_data.date
@@ -78,11 +78,31 @@ class CalendarDayRepository:
                 if received_day:
                     logger.info(f"Календарный день date={date} успешно обновлён (перед валидацией): {received_day}")
                     return CalendarDayInDB.model_validate(received_day)
-                logger.warning(f"При обновлении данных дня date={date} что-то пошло не так")
+                logger.warning(f"При обновлении календарного дня date={date} что-то пошло не так")
                 return None
-            logger.warning(f"День date={date} не существует")
+            logger.warning(f"Календарный день date={date} не существует")
             return None
         except Exception as e:
-            logger.error(f"При обновлении календарного дня произошла ошибка: {str(e)}", exc_info=True)
+            logger.error(f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
             await self._session.rollback()
-            raise
+            return None
+
+    async def delete_day(self, date: datetime.date) -> bool:
+        """
+        ### Удаляет календарный день по date
+        """
+
+        try:
+            logger.info(f"Пробуем удалить календарный день date={date}")
+            calendar_day = await self.get_day_by_date(date)
+            if calendar_day:
+                await self._session.delete(calendar_day)
+                await self._session.commit()
+                logger.info(f"Календарный день date={date} успешно удалён")
+                return True
+            logger.warning(f"Календарный день date={date} не найден")
+            return False
+        except Exception as e:
+            logger.error(f"При удалении календарного дня произошла ошибка: {str(e)}", exc_info=True)
+            await self._session.rollback()
+            return False
