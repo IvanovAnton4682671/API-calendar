@@ -95,11 +95,6 @@ class CalendarDayInput(BaseModel):
         le=3,
         description="Id типа дня"
     )
-    note: Optional[str] = Field(
-        None,
-        max_length=255,
-        description="Дополнительное описание дня"
-    )
 
     class Config:
         from_attributes = True
