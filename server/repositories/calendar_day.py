@@ -1,7 +1,7 @@
 from core.logger import setup_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.calendar_day import CalendarDay
-from typing import Optional
+from typing import Optional, List
 from schemas.calendar_day import CalendarDayInDB
 import datetime
 from sqlalchemy import select
@@ -42,7 +42,7 @@ class CalendarDayRepository:
 
     async def get_day_by_date(self, date: datetime.date) -> Optional[CalendarDay]:
         """
-        ### Ищет календарный день по date
+        ### Получает календарный день по дате
         """
 
         try:
@@ -59,9 +59,28 @@ class CalendarDayRepository:
             logger.error(f"При получении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
             return None
 
+    async def get_days_by_period(self, date_start: datetime.date, date_end: datetime.date) -> Optional[List[CalendarDayInDB]]:
+        """
+        ### Получает календарные дни по периоду
+        """
+
+        try:
+            logger.info(f"Пробуем получить календарные дни по периоду date_start={date_start}, date_end={date_end}")
+            query = select(CalendarDay).where(CalendarDay.date >= date_start, CalendarDay.date <= date_end).order_by(CalendarDay.date)
+            result = await self._session.execute(query)
+            list_of_days = result.scalars().all()
+            if list_of_days:
+                logger.info(f"Календарные дни по периоду date_start={date_start}, date_end={date_end} успешно получены, их {len(list_of_days)}")
+                return [CalendarDayInDB.model_validate(day) for day in list_of_days]
+            logger.warning(f"При получении календарных дней по периоду date_start={date_start}, date_end={date_end} что-то пошло не так")
+            return None
+        except Exception as e:
+            logger.error(f"При получении календарных дней по периоду date_start={date_start}, date_end={date_end} произошла ошибка: {str(e)}", exc_info=True)
+            return None
+
     async def update_day(self, date: datetime.date, day_data: CalendarDay) -> Optional[CalendarDayInDB]:
         """
-        ### Обновляет календарный день по date
+        ### Обновляет календарный день по дате
         """
 
         try:
@@ -89,7 +108,7 @@ class CalendarDayRepository:
 
     async def delete_day(self, date: datetime.date) -> bool:
         """
-        ### Удаляет календарный день по date
+        ### Удаляет календарный день по дате
         """
 
         try:

@@ -40,6 +40,36 @@ async def create_day(
             detail=str(e)
         )
 
+@router.get("/period/{period}", response_model=dict)
+async def get_days_by_period(
+    period: str,
+    compact: Optional[bool] = Query(False, description="Флаг сокращённого формата вывода"),
+    week_type: Optional[int] = Query(5, ge=5, le=6, description="Тип рабочей недели"),
+    session: AsyncSession = Depends(get_db_connection)
+) -> dict:
+    """
+    ### Получает календарные дни по периоду
+    """
+
+    try:
+        logger.info(f"Пробуем получить календарные дни по периоду={period}")
+        day_service = CalendarDayService(session)
+        result = await day_service.get_days_by_period(period, compact, week_type)
+        if result:
+            logger.info(f"Календарные дни по периоду={period} успешно получены, их {len(result.get('days'))}")
+            return result
+        logger.warning(f"При получении календарных дней по периоду={period} что-то пошло не так")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ошибка получения календарных дней по периоду={period}"
+        )
+    except Exception as e:
+        logger.error(f"При получении календарных дней по периоду={period} произошла ошибка: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
 @router.put("/date/{date}", response_model=CalendarDayInDB)
 async def update_day(
     date: datetime.date,
@@ -48,7 +78,7 @@ async def update_day(
     session: AsyncSession = Depends(get_db_connection)
 ) -> CalendarDayInDB:
     """
-    ### Обновляет календарный день по date
+    ### Обновляет календарный день по дате
     """
 
     try:
@@ -73,7 +103,7 @@ async def update_day(
 @router.delete("/date/{date}", response_model=dict)
 async def delete_day(date: datetime.date, session: AsyncSession = Depends(get_db_connection)) -> dict:
     """
-    ### Удаляет календарный день по date
+    ### Удаляет календарный день по дате
     """
 
     try:
