@@ -45,6 +45,7 @@ async def get_days_by_period(
     period: str,
     compact: Optional[bool] = Query(False, description="Флаг сокращённого формата вывода"),
     week_type: Optional[int] = Query(5, ge=5, le=6, description="Тип рабочей недели"),
+    statistic: Optional[bool] = Query(False, description="Подробная статистика по выбранному периоду"),
     session: AsyncSession = Depends(get_db_connection)
 ) -> dict:
     """
@@ -54,7 +55,7 @@ async def get_days_by_period(
     try:
         logger.info(f"Пробуем получить календарные дни по периоду={period}")
         day_service = CalendarDayService(session)
-        result = await day_service.get_days_by_period(period, compact, week_type)
+        result = await day_service.get_days_by_period(period, compact, week_type, statistic)
         if result:
             logger.info(f"Календарные дни по периоду={period} успешно получены, их {len(result.get('days'))}")
             return result

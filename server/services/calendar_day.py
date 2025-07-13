@@ -166,7 +166,7 @@ class CalendarDayService:
             logger.error(f"При парсинге period={period} произошла ошибка: {str(e)}", exc_info=True)
             return None
 
-    async def _formatting_list_of_days(self, list_of_days: List[CalendarDayInDB], compact: bool, week_type: int) -> Optional[List[CalendarDayInDB]]:
+    def _formatting_list_of_days(self, list_of_days: List[CalendarDayInDB], compact: bool, week_type: int) -> Optional[List[CalendarDayInDB]]:
         """
         ### Форматирует итоговый список календарных дней в зависимости от параметров compact и week_type
         """
@@ -200,6 +200,32 @@ class CalendarDayService:
             logger.error(f"При форматировании списка календарных дней произошла ошибка: {str(e)}", exc_info=True)
             return None
 
+    def _get_dop_statistic(self, list_of_days: List[CalendarDayInDB]) -> Optional[dict]:
+        """
+        ### Формирует дополнительную статистику по списку календарных дней
+        """
+
+        try:
+            calendar_days = len(list_of_days)
+            work_days, weekends, holidays = 0, 0, 0
+            for day in list_of_days:
+                if day.type_id == 1:
+                    work_days += 1
+                elif day.type_id == 2:
+                    weekends += 1
+                elif day.type_id == 3:
+                    holidays += 1
+            return {
+                "calendar_days": calendar_days,
+                "calendar_days_without_holidays": calendar_days - holidays,
+                "work_days": work_days,
+                "weekends": weekends,
+                "holidays": holidays
+            }
+        except Exception as e:
+            logger.error(f"При формировании дополнительной статистики произошла ошибка: {str(e)}", exc_info=True)
+            return None
+
     async def create_day(self, day_data: CalendarDayInput, note: Optional[str]) -> Optional[CalendarDayInDB]:
         """
         ### Создаёт календарный день
@@ -218,7 +244,7 @@ class CalendarDayService:
             logger.error(f"При создании календарного дня произошла ошибка: {str(e)}", exc_info=True)
             return None
 
-    async def get_days_by_period(self, period: str, compact: bool, week_type: int) -> Optional[dict]:
+    async def get_days_by_period(self, period: str, compact: bool, week_type: int, statistic: bool) -> Optional[dict]:
         """
         ### Получает календарные дни по периоду
         """
@@ -229,14 +255,19 @@ class CalendarDayService:
             list_of_days = await self._repo.get_days_by_period(date_start, date_end)
             if list_of_days:
                 logger.info(f"Календарные дни по периоду={period} успешно получены, их {len(list_of_days)}")
-                new_list_of_days = await self._formatting_list_of_days(list_of_days, compact, week_type)
-                return {
+                new_list_of_days = self._formatting_list_of_days(list_of_days, compact, week_type)
+                result = {
                     "date_start": date_start.strftime("%d.%m.%Y"),
                     "date_end": date_end.strftime("%d.%m.%Y"),
                     "work_week_type": f"{week_type}-и дневная рабочая неделя",
                     "period": period_name,
-                    "days": new_list_of_days
                 }
+                if statistic:
+                    dop_statistic = self._get_dop_statistic(list_of_days)
+                    if dop_statistic:
+                        result.update(dop_statistic)
+                result["days"] = new_list_of_days
+                return result
             logger.warning(f"При получении календарных дней по периоду={period} что-то пошло не так")
             return None
         except Exception as e:
