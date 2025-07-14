@@ -1,28 +1,55 @@
 from core.logger import setup_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.calendar_day import CalendarDay
-from typing import Optional, List
+from typing import Optional
 from schemas.calendar_day import CalendarDayInDB
-import datetime
+from datetime import date
 from sqlalchemy import select
 
 logger = setup_logger("repositories.calendar_day")
 
 class CalendarDayRepository:
-    """
-    ### Репозиторий CRUD-логики календарных дней
+    """Репозиторий CRUD-логики календарных дней
+
+    Класс описывает основные методы для взаимодействия с БД PostgreSQL, а именно:
+    создание дня; получение дней по периоду; обновление дня по дате; удаление дня по дате
+
+    Args:
+        session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
+
+    Examples:
+        >>>repo = CalendarDayRepository(session)
     """
 
     def __init__(self, session: AsyncSession) -> None:
-        """
-        ### Создаёт экземпляр для работы с асинхронной сессией БД
+        """Конструктор класса
+
+        Создаёт экземпляр класса для работы с асинхронной сессией БД PostgreSQL
+
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
         """
 
         self._session = session
 
-    async def create_day(self, day_data: CalendarDay) -> Optional[CalendarDayInDB]:
-        """
-        ### Создаёт календарный день
+    async def create_day(self, day_data: CalendarDay) -> CalendarDayInDB:
+        """Создаёт календарный день
+
+        Создаёт календарный день в БД из CalendarDay-модели
+
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            day_data (CalendarDay): Модель, представляющая все данные для создания календарного дня
+
+        Returns:
+            CalendarDayInDB: Представление созданного календарного дня в БД
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Examples:
+            >>>await repo.create_day(CalendarDay(date=...,...))
         """
 
         try:
@@ -30,38 +57,32 @@ class CalendarDayRepository:
             self._session.add(day_data)
             await self._session.commit()
             await self._session.refresh(day_data)
-            if day_data:
-                logger.info(f"Календарный день успешно создан (перед валидацией): {day_data}")
-                return CalendarDayInDB.model_validate(day_data)
-            logger.warning("При создании календарного дня что-то пошло не так")
-            return None
+            logger.info(f"Календарный день успешно создан (перед валидацией): {day_data}")
+            return CalendarDayInDB.model_validate(day_data)
         except Exception as e:
-            logger.error(f"При создании календарного дня произошла ошибка: {str(e)}", exc_info=True)
+            desc = f"При создании календарного дня произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
             await self._session.rollback()
-            return None
+            raise Exception(desc)
 
-    async def get_day_by_date(self, date: datetime.date) -> Optional[CalendarDay]:
-        """
-        ### Получает календарный день по дате
-        """
+    async def get_days_by_period(self, date_start: date, date_end: date) -> list[CalendarDayInDB]:
+        """Получает календарные дни по периоду
 
-        try:
-            logger.info(f"Пробуем получить день date={date}")
-            query = select(CalendarDay).where(CalendarDay.date == date)
-            result = await self._session.execute(query)
-            received_day = result.scalars().first()
-            if received_day:
-                logger.info(f"Календарный день date={date} успешно получен: {received_day}")
-                return received_day
-            logger.warning(f"При получении календарного дня date={date} что-то пошло не так")
-            return None
-        except Exception as e:
-            logger.error(f"При получении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
-            return None
+        Получает список календарных дней по периоду с date_start по date_end включительно
 
-    async def get_days_by_period(self, date_start: datetime.date, date_end: datetime.date) -> Optional[List[CalendarDayInDB]]:
-        """
-        ### Получает календарные дни по периоду
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            date_start (date): Дата начала периода
+            date_end (date): Дата конца периода
+
+        Returns:
+            list[CalendarDayInDB]: Список календарных дней, если такие дни нашлись, иначе пустой список
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Examples:
+            >>>await repo.get_days_by_period(date(2025, 1, 1), date(2025, 12, 1))
         """
 
         try:
@@ -72,19 +93,71 @@ class CalendarDayRepository:
             if list_of_days:
                 logger.info(f"Календарные дни по периоду date_start={date_start}, date_end={date_end} успешно получены, их {len(list_of_days)}")
                 return [CalendarDayInDB.model_validate(day) for day in list_of_days]
-            logger.warning(f"При получении календарных дней по периоду date_start={date_start}, date_end={date_end} что-то пошло не так")
-            return None
+            else:
+                logger.warning(f"Календарные дни по периоду date_start={date_start}, date_end={date_end} отсутствуют")
+                return []
         except Exception as e:
-            logger.error(f"При получении календарных дней по периоду date_start={date_start}, date_end={date_end} произошла ошибка: {str(e)}", exc_info=True)
-            return None
+            desc = f"При получении календарных дней по периоду date_start={date_start}, date_end={date_end} произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
+            raise Exception(desc)
 
-    async def update_day(self, date: datetime.date, day_data: CalendarDay) -> Optional[CalendarDayInDB]:
-        """
-        ### Обновляет календарный день по дате
+    async def get_day_by_date(self, date: date) -> Optional[CalendarDay]:
+        """Получает календарный день по дате
+
+        Получает один календарный день по дате date
+
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            date (date): Дата дня
+
+        Returns:
+            Optional[CalendarDay]: Календарный день, если такой день нашёлся, иначе None
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Examples:
+            >>>await repo.get_day_by_date(date(2025, 1, 1))
         """
 
         try:
-            logger.info(f"Пробуем обновить календарный день date={date} данными: {day_data}")
+            logger.info(f"Пробуем получить день date={date}")
+            query = select(CalendarDay).where(CalendarDay.date == date)
+            result = await self._session.execute(query)
+            received_day = result.scalars().first()
+            if received_day:
+                logger.info(f"Календарный день date={date} успешно получен: {received_day}")
+                return received_day
+            else:
+                logger.warning(f"Календарный день date={date} не существует")
+                return None
+        except Exception as e:
+            desc = f"При получении календарного дня date={date} произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
+            raise Exception(desc)
+
+    async def update_day(self, date: date, day_data: CalendarDay) -> Optional[CalendarDayInDB]:
+        """Обновляет календарный день по дате
+
+        Получает календарный день по дате date и обновляет его новыми данными
+
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            date (date): Дата обновляемого дня
+            day_data (CalendarDay): Данные для обновления календарного дня
+
+        Returns:
+            Optional[CalendarDayInDB]: Обновлённый календарный день, если такой день существовал, иначе None
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Examples:
+            >>>await repo.update_day(date(2025, 1, 1), CalendarDay(date=...,...))
+        """
+
+        try:
+            logger.info(f"Пробуем обновить календарный день date={date} данными={day_data}")
             received_day = await self.get_day_by_date(date)
             if received_day:
                 received_day.date = day_data.date
@@ -94,21 +167,34 @@ class CalendarDayRepository:
                 received_day.week_day = day_data.week_day
                 await self._session.commit()
                 await self._session.refresh(received_day)
-                if received_day:
-                    logger.info(f"Календарный день date={date} успешно обновлён (перед валидацией): {received_day}")
-                    return CalendarDayInDB.model_validate(received_day)
-                logger.warning(f"При обновлении календарного дня date={date} что-то пошло не так")
+                logger.info(f"Календарный день date={date} успешно обновлён (перед валидацией): {received_day}")
+                return CalendarDayInDB.model_validate(received_day)
+            else:
+                logger.warning(f"Календарный день date={date} не существует")
                 return None
-            logger.warning(f"Календарный день date={date} не существует")
-            return None
         except Exception as e:
-            logger.error(f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
+            desc = f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
             await self._session.rollback()
-            return None
+            raise Exception(desc)
 
-    async def delete_day(self, date: datetime.date) -> bool:
-        """
-        ### Удаляет календарный день по дате
+    async def delete_day(self, date: date) -> bool:
+        """Удаляет календарный день по дате
+
+        Удаляет календарный день по дате date
+
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            date (date): Дата удаляемого дня
+
+        Returns:
+            bool: Статус удалённого дня (True - день удалён, False - день не существует)
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Examples:
+            >>>await repo.delete_day(date(2025, 1, 1))
         """
 
         try:
@@ -119,8 +205,9 @@ class CalendarDayRepository:
                 await self._session.commit()
                 logger.info(f"Календарный день date={date} успешно удалён")
                 return True
-            logger.warning(f"Календарный день date={date} не найден")
-            return False
+            else:
+                logger.warning(f"Календарный день date={date} не существует")
+                return False
         except Exception as e:
             logger.error(f"При удалении календарного дня произошла ошибка: {str(e)}", exc_info=True)
             await self._session.rollback()

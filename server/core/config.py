@@ -1,12 +1,30 @@
 from core.logger import setup_logger
 from pydantic_settings import BaseSettings
-from pydantic import Field, SecretStr, computed_field, model_validator
+from pydantic import Field, SecretStr, computed_field
 
 logger = setup_logger("core.config")
 
 class Settings(BaseSettings):
-    """
-    ### Описывает все используемые переменные окружения
+    """Для работы с переменными окружения
+
+    Класс предназначен для удобной работы со всеми переменными окружение
+    без нужды подгружать их через dotenv
+
+    Attributes:
+        POSTGRESQL_HOST (str): Хост подключения к PostgreSQL
+        POSTGRESQL_PORT (int): Порт подключения к PostgreSQL
+        POSTGRESQL_USER (str): Логин пользователя PostgreSQL
+        POSTGRESQL_PASSWORD (SecretStr): Пароль пользователя PostgreSQL
+        POSTGRESQL_DB (str): Название БД PostgreSQL
+        POSTGRESQL_URL (SecretStr): Адрес подключения к PostgreSQL
+        APP_NAME (str): Имя запускаемого экземпляра сервера
+        APP_HOST (str): Хост сервера
+        APP_PORT (int): Порт сервера
+        APP_DEBUG (bool): Флаг отладки сервера
+
+    Examples:
+        >>>settings = Settings()
+        >>>host = settings.POSTGRESQL_HOST
     """
 
     POSTGRESQL_HOST: str = Field(
@@ -60,36 +78,41 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def POSTGRESQL_URL(self) -> SecretStr:
-        """
-        ### Адрес подключения к PostgreSQL, собирается при старте сервера
-        """
+        """Адрес подключения к PostgreSQL
 
-        return SecretStr(
-            f"postgresql+asyncpg://"
-            f"{self.POSTGRESQL_USER}:{self.POSTGRESQL_PASSWORD.get_secret_value()}"
-            f"@{self.POSTGRESQL_HOST}:{self.POSTGRESQL_PORT}"
-            f"/{self.POSTGRESQL_DB}"
-        )
+        Адрес подключения к PostgreSQL, собирается при старте сервера
 
-    @model_validator(mode="after")
-    def validate_url(self) -> "Settings":
-        """
-        ### Проверяет наличие адреса подключения к PostgreSQL
+        Args:
+            self (Self@Settings): Экземпляр класса Settings
+
+        Returns:
+            SecretStr: Полная строка подключения к БД формата 
+                'postgresql+asyncpg://username:password@host:port/db_name'
+
+        Raises:
+            Exception: В непредвиденной ситуации
         """
 
         try:
-            if not self.POSTGRESQL_URL.get_secret_value():
-                desc = f"Некорректные данные адреса подключения к PostgreSQL: {self.POSTGRESQL_URL.get_secret_value()}"
-                logger.warning(desc)
-                raise ValueError(desc)
-            return self
+            return SecretStr(
+                f"postgresql+asyncpg://"
+                f"{self.POSTGRESQL_USER}:{self.POSTGRESQL_PASSWORD.get_secret_value()}"
+                f"@{self.POSTGRESQL_HOST}:{self.POSTGRESQL_PORT}"
+                f"/{self.POSTGRESQL_DB}"
+            )
         except Exception as e:
-            logger.error(f"При проверке POSTGRESQL_URL произошла ошибка: {str(e)}", exc_info=True)
-            raise
+            desc = f"При сборке адреса подключения к БД произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
+            raise Exception(desc)
 
     class Config:
-        """
-        ### Описывает используемый `.env`-файл
+        """Класс дополнительных настроек
+
+        Класс с дополнительными настройками для класса Settings
+
+        Attributes:
+            env_file (str): Название файла с переменными окружения
+            env_file_encoding (str): Кодировка файла с переменными окружения
         """
 
         env_file = ".env"

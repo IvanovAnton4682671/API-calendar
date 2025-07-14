@@ -1,7 +1,7 @@
 from core.logger import setup_logger
 from sqlalchemy.orm import declarative_base
-from core.config import settings
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from core.config import settings
 from typing import AsyncGenerator
 
 logger = setup_logger("databases.postgresql")
@@ -23,8 +23,21 @@ async_session_maker = async_sessionmaker(
 )
 
 async def get_db_connection() -> AsyncGenerator[AsyncSession, None]:
-    """
-    ### Асинхронно создаёт и возвращает сессию для работы с БД PostgreSQL
+    """Возвращает асинхронную сессию для работы с PostgreSQL
+
+    Асинхронно создаёт и возвращает сессию для работы с БД PostgreSQL
+
+    Returns:
+        AsyncGenerator[AsyncSession, None]: Асинхронная сессия, работа с которой
+            происходит с использованием асинхронного контекстного менеджера
+
+    Raises:
+        Exception: В непредвиденной ситуации
+
+    Examples:
+        >>>async with get_db_connection() as session:
+        >>>result = await session.execute("SELECT * FROM db_name;")
+        >>>print(result.scalars().all())
     """
 
     async with async_session_maker() as session:
@@ -32,8 +45,9 @@ async def get_db_connection() -> AsyncGenerator[AsyncSession, None]:
             yield session
             await session.commit()
         except Exception as e:
-            logger.critical(f"При работе с асинхронной сессией произошла ошибка: {str(e)}", exc_info=True)
+            desc = f"При работе с асинхронной сессией произошла ошибка: {str(e)}"
+            logger.critical(desc, exc_info=True)
             await session.rollback()
-            raise
+            raise Exception(desc)
         finally:
             await session.close()

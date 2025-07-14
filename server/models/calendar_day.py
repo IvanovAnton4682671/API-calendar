@@ -5,11 +5,24 @@ from sqlalchemy import Column, Integer, Date, String
 logger = setup_logger("models.calendar_day")
 
 class CalendarDay(Base):
-    """
-    ### Таблица календарных дней
+    """Описывает таблицу календарных дней
+
+    Класс описывает ORM-модель календарного дня для работы с БД PostgreSQL
+
+    Attributes:
+        __tablename__ (str): Название таблицы
+        id (Integer): Id дня
+        date (Date): Дата дня
+        type_id (Integer): Id типа дня
+        type_text (String): Описание типа дня
+        note (String): Дополнительное описание дня
+        week_day (String): Сокращённое наименование дня
+
+    Examples:
+        >>>calendar_day = CalendarDay(date=...,...)
     """
 
-    __tablename__ = "calendar_day"
+    __tablename__: str = "calendar_day"
 
     id = Column(
         Integer,
@@ -46,13 +59,32 @@ class CalendarDay(Base):
     )
 
     def __repr__(self) -> str:
-        """
-        ### Вывод элемента таблицы в терминал
+        """Понятно выводит информацию об экземпляре
+
+        Выводит информацию об экземпляре в понятном виде
+
+        Args:
+            self (Self@CalendarDay): Экземпляр класса CalendarDay
+
+        Returns:
+            str: Строка со всеми полями экземпляра
+
+        Raises:
+            Examples: В непредвиденной ситуации
+
+        Examples:
+            >>>calendar_day = CalendarDay(date=...,type_id=...,...)
+            >>>print(calendar_day)
+            >>>`<Day(id=...,...)>`
         """
 
-        calendar_day = (
-            f"<Day(id={self.id};date={self.date};type_id={self.type_id};"
-            f"type_text={self.type_text};note={self.note};week_day={self.week_day})>"
-        )
-        logger.info(calendar_day)
-        return calendar_day
+        try:
+            calendar_day = (
+                f"<Day(id={self.id};date={self.date};type_id={self.type_id};"
+                f"type_text={self.type_text};note={self.note};week_day={self.week_day})>"
+            )
+            return calendar_day
+        except Exception as e:
+            desc = f"При выводе информации об экземпляре CalendarDay произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
+            raise Exception(desc)

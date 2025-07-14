@@ -11,8 +11,16 @@ logger = setup_logger("main")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    ### Создание таблиц при старте сервера
+    """Создание таблицы БД
+
+    Создаёт таблицу БД при старте сервиса
+    Предполагается использование только при старте сервера
+
+    Args:
+        app (FastAPI): Экземпляр сервера
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:
@@ -21,8 +29,9 @@ async def lifespan(app: FastAPI):
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Таблица создана")
     except Exception as e:
-        logger.error(f"При создании таблицы произошла ошибка: {str(e)}", exc_info=True)
-        raise
+        desc = f"При создании таблицы произошла ошибка: {str(e)}"
+        logger.error(desc, exc_info=True)
+        raise Exception(desc)
     yield
     logger.info("Остановка сервера")
     await engine.dispose()
@@ -44,7 +53,15 @@ app.add_middleware(
 app.include_router(calendar_day.router)
 
 @app.get("/")
-async def root():
+async def root() -> dict:
+    """Заглушка
+
+    Обычная заглушка, показывает что сервер запущен
+    Предполагается использование только в роутинге
+
+    Returns:
+        dict: Словарь с информацией о запуске сервера
+    """
     return {"message": "Calendar-API is running..."}
 
 if __name__ == "__main__":

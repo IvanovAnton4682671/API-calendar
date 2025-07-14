@@ -1,48 +1,94 @@
 from core.logger import setup_logger
+from core.consts import DAY_TYPES, WEEK_DAYS
 from pydantic import BaseModel, Field, field_validator
 import datetime
 from typing import Optional
-from core.consts import DAY_TYPES, WEEK_DAYS
 
 logger = setup_logger("schemas.calendar_day")
 
 def validate_type_text(type_text: str) -> str:
-    """
-    ### Валидация поля type_text
+    """Валидация поля type_text
+
+    Валидация поля type_text; поле должно принимать значения из константы DAY_TYPES
+    Функция предназначена для использоваться как валидатор в классе Pydantic
+
+    Args:
+        type_text (str): Описание типа дня
+
+    Returns:
+        str: Описание типа дня, если оно прошло валидацию
+
+    Raises:
+        ValueError: При некорректном значении type_text
+        Exception: В непредвиденной ситуации
+
+    Examples:
+        >>>class Test(BaseModel):
+        >>>type_text: str = Filed(...)
+        >>>_validate_type_text = field_validator("type_text")(validate_type_text)
     """
 
     try:
         vars = DAY_TYPES.values()
         if type_text not in vars:
-            desc = f"Поле type_text может принимать значения {vars}, но получено значение {type_text}"
+            desc = f"Поле type_text может принимать значения {vars}, но принимает значение {type_text}"
             logger.warning(desc)
             raise ValueError(desc)
         return type_text
     except Exception as e:
-        desc = f"При валидации поля type_text произошла ошибка: {str(e)}"
+        desc = f"При валидации поля type_text={type_text} произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
         raise Exception(desc)
 
 def validate_week_day(week_day: str) -> str:
-    """
-    ### Валидация поля week_day
+    """Валидация поля week_day
+
+    Валидация поля week_day; поле должно принимать значения из константы WEEK_DAYS
+    Функция предназначена для использоваться как валидатор в классе Pydantic
+
+    Args:
+        week_day (str): Сокращённое наименование дня
+
+    Returns:
+        str: Сокращённое наименование дня, если оно прошло валидацию
+
+    Raises:
+        ValueError: При некорректном значении week_day
+        Exception: В непредвиденной ситуации
+
+    Examples:
+        >>>class Test(BaseModel):
+        >>>week_day: str = Filed(...)
+        >>>_validate_week_day = field_validator("week_day")(validate_week_day)
     """
 
     try:
         vars = WEEK_DAYS
         if week_day not in vars:
-            desc = f"Поле week_day может принимать значения {vars}, но получено значение {week_day}"
+            desc = f"Поле week_day может принимать значения {vars}, но принимает значение {week_day}"
             logger.warning(desc)
             raise ValueError(desc)
         return week_day
     except Exception as e:
-        desc = f"При валидации поля week_day произошла ошибка: {str(e)}"
+        desc = f"При валидации поля week_day={week_day} произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
         raise Exception(desc)
 
 class BaseCalendarDay(BaseModel):
-    """
-    ### Представление обычного календарного дня
+    """Схема обычного календарного дня
+
+    Класс описывает схему валидации данных для обычного календарного дня
+
+    Attributes:
+        date (datetime.date): Дата дня
+        type_id (int): Id типа дня
+        type_text (str): Описание типа дня
+        week_day (str): Сокращённое наименование дня
+        _validate_type_text (@field_validator): Валидатор поля type_text
+        _validate_week_day (@field_validator): Валидатор поля week_day
+
+    Examples:
+        >>>base_day = BaseCalendarDay(date=...,...)
     """
 
     date: datetime.date = Field(
@@ -72,11 +118,27 @@ class BaseCalendarDay(BaseModel):
     _validate_week_day = field_validator("week_day")(validate_week_day)
 
     class Config:
+        """Класс дополнительных настроек
+
+        Класс с дополнительными настройками для класса BaseCalendarDay
+
+        Attributes:
+            from_attributes (bool): Для синхронизации с полями ORM-модели
+        """
+
         from_attributes = True
 
 class CalendarDayInput(BaseModel):
-    """
-    ### Представление получаемых данных для создания календарного дня
+    """Схема данных для создания календарного дня
+
+    Класс описывает схему валидации данных для создания календарного дня
+
+    Attributes:
+        date (datetime.date): Дата дня
+        type_id (int): Id типа дня
+
+    Examples:
+        >>>input_data = CalendarDayInput(data=...,...)
     """
 
     date: datetime.date = Field(
@@ -91,11 +153,30 @@ class CalendarDayInput(BaseModel):
     )
 
     class Config:
+        """Класс дополнительных настроек
+
+        Класс с дополнительными настройками для класса CalendarDayInput
+
+        Attributes:
+            from_attributes (bool): Для синхронизации с полями ORM-модели
+        """
+
         from_attributes = True
 
 class CalendarDayInDB(BaseModel):
-    """
-    ### Представление календарного дня в БД
+    """Схема календарного дня в БД
+
+    Класс описывает схему валидации данных для календарного дня в БД
+
+    Attributes:
+        id (int): Id дня
+        date (datetime.date): Дата дня
+        type_id (int): Id типа дня
+        type_text (str): Описание типа дня
+        note (str): Дополнительное описание дня
+        week_day (str): Сокращённое наименование дня
+        _validate_type_text (@field_validator): Валидатор поля type_text
+        _validate_week_day (@field_validator): Валидатор поля week_day
     """
 
     id: int = Field(
@@ -134,4 +215,12 @@ class CalendarDayInDB(BaseModel):
     _validate_week_day = field_validator("week_day")(validate_week_day)
 
     class Config:
+        """Класс дополнительных настроек
+
+        Класс с дополнительными настройками для класса CalendarDayInDB
+
+        Attributes:
+            from_attributes (bool): Для синхронизации с полями ORM-модели
+        """
+
         from_attributes = True

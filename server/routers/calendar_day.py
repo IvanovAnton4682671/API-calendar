@@ -3,9 +3,9 @@ from fastapi import APIRouter, Query, Depends, HTTPException, status
 from schemas.calendar_day import CalendarDayInDB, CalendarDayInput
 from sqlalchemy.ext.asyncio import AsyncSession
 from databases.postgresql import get_db_connection
-from typing import Optional
+from typing import Optional, Union
 from services.calendar_day import CalendarDayService
-import datetime
+from datetime import date
 
 logger = setup_logger("repositories.calendar_day")
 
@@ -17,22 +17,29 @@ async def create_day(
     note: Optional[str] = Query(None, description="Дополнительное описание дня"),
     session: AsyncSession = Depends(get_db_connection)
 ) -> CalendarDayInDB:
-    """
-    ### Создаёт календарный день
+    """Создаёт календарный день
+
+    Создаёт календарный день по полученным данным
+    Предполагается использование только в роутинге
+
+    Args:
+        day_data (CalendarDayInput): Данные для создания дня
+        note (Optional[str]): Опциональное описание дня
+        session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
+
+    Returns:
+        CalendarDayInDB: Представление созданного дня в БД
+
+    Raises:
+        HTTPException: В непредвиденной ситуации
     """
 
     try:
         logger.info(f"Пробуем создать календарный день с данными: day_data={day_data}, note={note}")
         day_service = CalendarDayService(session)
         created_day = await day_service.create_day(day_data, note)
-        if created_day:
-            logger.info(f"Календарный день успешно создан (после валидации): {created_day}")
-            return created_day
-        logger.warning(f"При создании календарного дня что-то пошло не так")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Ошибка создания календарного дня"
-        )
+        logger.info(f"Календарный день успешно создан (после валидации): {created_day}")
+        return created_day
     except Exception as e:
         logger.error(f"При создании календарного дня произошла ошибка: {str(e)}", exc_info=True)
         raise HTTPException(
@@ -48,22 +55,32 @@ async def get_days_by_period(
     statistic: Optional[bool] = Query(False, description="Подробная статистика по выбранному периоду"),
     session: AsyncSession = Depends(get_db_connection)
 ) -> dict:
-    """
-    ### Получает календарные дни по периоду
+    """Получает календарные дни по периоду
+
+    Получает календарные дни по периоду period, а также форматирует вид списка в зависимости
+    от параметров compact, week_type и statistic
+    Предполагается использование только в роутинге
+
+    Args:
+        period (str): Временной период получаемых дней
+        compact (Optional[bool]): Статус формата вывода данных (True - сокращённый, False - полный)
+        week_type (Optional[int]): Формат рабочей недели (5- или 6-дневная)
+        statistic (Optional[bool]): Статус статистики (True - полная, False - сокращённая)
+        session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
+
+    Returns:
+        dict: Словарь со всей информацией
+
+    Raises:
+        HTTPException: В непредвиденной ситуации
     """
 
     try:
         logger.info(f"Пробуем получить календарные дни по периоду={period}")
         day_service = CalendarDayService(session)
         result = await day_service.get_days_by_period(period, compact, week_type, statistic)
-        if result:
-            logger.info(f"Календарные дни по периоду={period} успешно получены, их {len(result.get('days'))}")
-            return result
-        logger.warning(f"При получении календарных дней по периоду={period} что-то пошло не так")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Ошибка получения календарных дней по периоду={period}"
-        )
+        logger.info(f"Календарные дни по периоду={period} успешно получены, их {len(result.get('days'))}")
+        return result
     except Exception as e:
         logger.error(f"При получении календарных дней по периоду={period} произошла ошибка: {str(e)}", exc_info=True)
         raise HTTPException(
@@ -71,15 +88,29 @@ async def get_days_by_period(
             detail=str(e)
         )
 
-@router.put("/date/{date}", response_model=CalendarDayInDB)
+@router.put("/date/{date}", response_model=Union[CalendarDayInDB, dict])
 async def update_day(
-    date: datetime.date,
+    date: date,
     day_data: CalendarDayInput,
     note: Optional[str] = Query(None, description="Дополнительное описание дня"),
     session: AsyncSession = Depends(get_db_connection)
-) -> CalendarDayInDB:
-    """
-    ### Обновляет календарный день по дате
+) -> Union[CalendarDayInDB, dict]:
+    """Обновляет календарный день по дате
+
+    Обновляет календарный день по дате date данными day_data и note
+    Предполагается использование только в роутинге
+
+    Args:
+        date (date): Дата обновляемого дня
+        day_data (CalendarDayInput): Данные для обновления дня
+        note (Optional[str]): Опциональное описание дня
+        session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
+
+    Returns:
+        Union[CalendarDayInDB, dict]: Возвращает либо обновлённый день, либо пустой словарь (если день не существует)
+
+    Raises:
+        HTTPException: В непредвиденной ситуации
     """
 
     try:
@@ -89,11 +120,9 @@ async def update_day(
         if updated_day:
             logger.info(f"Календарный день date={date} успешно обновлён (после валидации): {updated_day}")
             return updated_day
-        logger.warning(f"При обновлении календарного дня date={date} что-то пошло не так")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Ошибка обновления календарного дня"
-        )
+        else:
+            logger.warning(f"Календарный день date={date} не существует")
+            return {"message": f"Календарный день date={date} не существует"}
     except Exception as e:
         logger.error(f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
         raise HTTPException(
@@ -102,9 +131,21 @@ async def update_day(
         )
 
 @router.delete("/date/{date}", response_model=dict)
-async def delete_day(date: datetime.date, session: AsyncSession = Depends(get_db_connection)) -> dict:
-    """
-    ### Удаляет календарный день по дате
+async def delete_day(date: date, session: AsyncSession = Depends(get_db_connection)) -> dict:
+    """Удаляет календарный день по дате
+
+    Удаляет календарный день по дате date
+    Предполагается использование только в роутинге
+
+    Args:
+        date (date): Дата удаляемого дня
+        session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
+
+    Returns:
+        dict: Словарь со статусом удаления дня
+
+    Raises:
+        HTTPException: В непредвиденной ситуации
     """
 
     try:
@@ -113,12 +154,10 @@ async def delete_day(date: datetime.date, session: AsyncSession = Depends(get_db
         deleted_status = await day_service.delete_day(date)
         if deleted_status:
             logger.info(f"Календарный день date={date} успешно удалён")
-            return {"status": True}
-        logger.warning(f"При удалении календарного дня date={date} что-то пошло не так")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Ошибка удаления календарного дня"
-        )
+            return {"message": f"Календарный день date={date} успешно удалён"}
+        else:
+            logger.warning(f"Календарный день date={date} не существует")
+            return {"message": f"Календарный день date={date} не существует"}
     except Exception as e:
         logger.error(f"При удалении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
         raise HTTPException(
