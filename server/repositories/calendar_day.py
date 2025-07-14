@@ -49,7 +49,7 @@ class CalendarDayRepository:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await repo.create_day(CalendarDay(date=...,...))
+            >>>created_day = await repo.create_day(CalendarDay(date=...,...))
         """
 
         try:
@@ -82,7 +82,7 @@ class CalendarDayRepository:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await repo.get_days_by_period(date(2025, 1, 1), date(2025, 12, 1))
+            >>>db_days = await repo.get_days_by_period(date(2025, 1, 1), date(2025, 12, 1))
         """
 
         try:
@@ -117,7 +117,7 @@ class CalendarDayRepository:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await repo.get_day_by_date(date(2025, 1, 1))
+            >>>day = await repo.get_day_by_date(date(2025, 1, 1))
         """
 
         try:
@@ -153,7 +153,7 @@ class CalendarDayRepository:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await repo.update_day(date(2025, 1, 1), CalendarDay(date=...,...))
+            >>>updated_day = await repo.update_day(date(2025, 1, 1), CalendarDay(date=...,...))
         """
 
         try:
@@ -194,7 +194,7 @@ class CalendarDayRepository:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await repo.delete_day(date(2025, 1, 1))
+            >>>deleted_day = await repo.delete_day(date(2025, 1, 1))
         """
 
         try:

@@ -49,7 +49,7 @@ class CalendarDayService:
             Exception: В непредвиденной ситуации
 
         Example:
-            >>>await service.create_day(CalendarDayInput(date=...,...))
+            >>>created_day = await service.create_day(CalendarDayInput(date=...,...))
         """
 
         try:
@@ -84,7 +84,7 @@ class CalendarDayService:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await service.get_days_by_period("2025", False, 5, True)
+            >>>result = await service.get_days_by_period("2025", False, 5, True)
         """
 
         try:
@@ -129,7 +129,7 @@ class CalendarDayService:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await service.update_day(date(2025, 1, 1), CalendarDayInput(date=...,...), "Описание")
+            >>>updated_day = await service.update_day(date(2025, 1, 1), CalendarDayInput(date=...,...), "Описание")
         """
 
         try:
@@ -163,7 +163,7 @@ class CalendarDayService:
             Exception: В непредвиденной ситуации
 
         Examples:
-            >>>await service.delete_day(date(2025, 1, 1))
+            >>>deleted_day = await service.delete_day(date(2025, 1, 1))
         """
 
         try:
