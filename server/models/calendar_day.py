@@ -78,13 +78,7 @@ class CalendarDay(Base):
             >>>`<Day(id=...,...)>`
         """
 
-        try:
-            calendar_day = (
-                f"<Day(id={self.id};date={self.date};type_id={self.type_id};"
-                f"type_text={self.type_text};note={self.note};week_day={self.week_day})>"
-            )
-            return calendar_day
-        except Exception as e:
-            desc = f"При выводе информации об экземпляре CalendarDay произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+        return (
+            f"<Day(id={self.id};date={self.date};type_id={self.type_id};"
+            f"type_text={self.type_text};note={self.note};week_day={self.week_day})>"
+        )

@@ -1,7 +1,8 @@
 from core.logger import setup_logger
 from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, status
+from fastapi.responses import JSONResponse
 from databases.postgresql import engine, Base
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import calendar_day
 import uvicorn
@@ -51,6 +52,26 @@ app.add_middleware(
 )
 
 app.include_router(calendar_day.router)
+
+@app.exception_handler(Exception)
+async def general_exception_handler(request: Request, exception: Exception) -> JSONResponse:
+    """Общий обработчик всех ошибок
+
+    Обработчик, который логирует и перехватывает все ошибки
+
+    Args:
+        request (Request): Запрос, вызвавший ошибку
+        exception (Exception): Какая-то ошибка
+
+    Returns:
+        JSONResponse: Ответ обработчика ошибок
+    """
+
+    logger.error(f"Запрос: {request.method} {request.url}\nОшибка: {str(exception)}")
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": str(exception)}
+    )
 
 @app.get("/")
 async def root() -> dict:

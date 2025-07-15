@@ -59,9 +59,8 @@ class CalendarDayService:
             logger.info(f"Календарный день успешно создан (после валидации): {created_day}")
             return created_day
         except Exception as e:
-            desc = f"При создании календарного дня с данными: day_data={day_data}, note={note} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            logger.error(f"При создании календарного дня с данными: day_data={day_data}, note={note} произошла ошибка: {str(e)}", exc_info=True)
+            raise e
 
     async def get_days_by_period(self, period: str, compact: bool, week_type: int, statistic: bool) -> dict:
         """Получает календарные дни по периоду
@@ -107,9 +106,8 @@ class CalendarDayService:
             result["days"] = result_days
             return result
         except Exception as e:
-            desc = f"При получении календарных дней по периоду={period} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            logger.error(f"При получении календарных дней по периоду={period} произошла ошибка: {str(e)}", exc_info=True)
+            raise e
 
     async def update_day(self, date: date, day_data: CalendarDayInput, note: Optional[str]) -> Optional[CalendarDayInDB]:
         """Обновляет календарный день по дате
@@ -143,9 +141,8 @@ class CalendarDayService:
                 logger.warning(f"Календарный день date={date} не существует")
                 return None
         except Exception as e:
-            desc = f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            logger.error(f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
+            raise e
 
     async def delete_day(self, date: date) -> bool:
         """Удаляет календарный день по дате
@@ -176,6 +173,5 @@ class CalendarDayService:
                 logger.warning(f"Календарный день date={date} не существует")
                 return False
         except Exception as e:
-            desc = f"При удалении календарного дня date={date} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            logger.error(f"При удалении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
+            raise e

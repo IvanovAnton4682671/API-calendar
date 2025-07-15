@@ -48,6 +48,6 @@ async def get_db_connection() -> AsyncGenerator[AsyncSession, None]:
             desc = f"При работе с асинхронной сессией произошла ошибка: {str(e)}"
             logger.critical(desc, exc_info=True)
             await session.rollback()
-            raise Exception(desc)
+            raise e
         finally:
             await session.close()

@@ -35,7 +35,6 @@ def assemble_day(day_data: CalendarDayInput, note: Optional[str]) -> CalendarDay
             note=note,
             week_day=WEEK_DAYS[day_data.date.weekday()]
         )
-        logger.info(f"CalendarDay (из полей: day_data={day_data}, note={note}) успешно собран: {calendar_day}")
         return calendar_day
     except Exception as e:
         desc = f"При сборке CalendarDay (из полей: day_data={day_data}, note={note}) произошла ошибка: {str(e)}"
