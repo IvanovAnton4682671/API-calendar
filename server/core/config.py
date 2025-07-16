@@ -21,6 +21,7 @@ class Settings(BaseSettings):
         APP_HOST (str): Хост сервера
         APP_PORT (int): Порт сервера
         APP_DEBUG (bool): Флаг отладки сервера
+        EXTERNAL_URL (str): URL-адрес внешнего сервиса, который предоставляет данные производственного календаря
 
     Examples:
         >>>settings = Settings()
@@ -73,6 +74,12 @@ class Settings(BaseSettings):
     APP_DEBUG: bool = Field(
         ...,
         description="Флаг отладки сервера"
+    )
+
+    EXTERNAL_URL: str = Field(
+        ...,
+        min_length=1,
+        description="URL-адрес внешнего сервиса, который предоставляет данные производственного календаря"
     )
 
     @computed_field

@@ -29,9 +29,6 @@ async def create_day(
 
     Returns:
         CalendarDayInDB: Представление созданного дня в БД
-
-    Raises:
-        HTTPException: В непредвиденной ситуации
     """
 
     logger.info(f"Пробуем создать календарный день с данными: day_data={day_data}, note={note}")
@@ -63,9 +60,6 @@ async def get_days_by_period(
 
     Returns:
         dict: Словарь со всей информацией
-
-    Raises:
-        HTTPException: В непредвиденной ситуации
     """
 
     logger.info(f"Пробуем получить календарные дни по периоду={period}")
@@ -94,9 +88,6 @@ async def update_day(
 
     Returns:
         Union[CalendarDayInDB, dict]: Возвращает либо обновлённый день, либо пустой словарь (если день не существует)
-
-    Raises:
-        HTTPException: В непредвиденной ситуации
     """
 
     logger.info(f"Пробуем обновить календарный день date={date} данными: day_data={day_data}, note={note}")
@@ -122,9 +113,6 @@ async def delete_day(date: date, session: AsyncSession = Depends(get_db_connecti
 
     Returns:
         dict: Словарь со статусом удаления дня
-
-    Raises:
-        HTTPException: В непредвиденной ситуации
     """
 
     logger.info(f"Пробуем удалить календарный день date={date}")

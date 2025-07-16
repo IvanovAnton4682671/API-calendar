@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from databases.postgresql import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
-from routers import calendar_day
+from routers import calendar_day, external
 import uvicorn
 from core.config import settings
 
@@ -52,6 +52,7 @@ app.add_middleware(
 )
 
 app.include_router(calendar_day.router)
+app.include_router(external.router)
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exception: Exception) -> JSONResponse:
