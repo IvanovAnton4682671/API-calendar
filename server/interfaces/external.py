@@ -1,53 +1,57 @@
 from core.logger import setup_logger
 from core.config import settings
-from httpx import AsyncClient, Response
+from httpx import AsyncClient
 
 logger = setup_logger("interfaces.external")
 
 class ExternalInterface:
-    """Интерфейс взаимодействия с внешним ресурсом
+    """Интерфейс взаимодействия с внешними ресурсами
 
-    Класс описывает интерфейс для взаимодействия с внешним ресурсом isdayoff.ru
+    Класс представляет собой интерфейс взаимодействия с внешними ресурсами, которые предоставляют данные производственных календарей
 
     Example:
         >>>external_interface = ExternalInterface()
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Конструктор класса
 
-        Создаёт экземпляр класса для работы с внешним источником данных
+        Создаёт экземпляр класса для отправки запросов внешним источникам данных
 
         Args:
             self (Self@ExternalInterface): Экземпляр класса
         """
-        self._base_url = f"{settings.EXTERNAL_URL}"
-        self._client = AsyncClient()
 
-    async def get_days_by_year(self, year: str, week_type: int) -> str:
-        """GET-запрос на получение данных
+        self._consultant_url = settings.CONSULTANT_CALENDAR_URL
 
-        Выполняет GET-запрос на ресурс isdayoff.ru, после чего возвращает полученную строку дней формата "10010101",
-        где 0 - рабочий день, 1 - нерабочий
+    async def get_consultant_calendar(self, year_str: str) -> str:
+        """GET-запрос к Консультанту
+
+        Выполняет асинхронный GET-запрос с эмуляцией браузерного запроса для получения HTML-страницы производственного календаря
 
         Args:
             self (Self@ExternalInterface): Экземпляр класса
-            year (int): Год, за который получает список дней
-            week_type (int): Тип рабочей недели
+            year_str (str): Год в формате строки
 
         Returns:
-            str: Контент ответа в виде одной строки
+            str: HTML-страница в формате строки
 
-        Examples:
-            >>>result = await external_interface.get_days_bu_year("2025", 5)
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Example:
+            >>> response_text = await external_interface.get_consultant_calendar("2025")
         """
 
-        try:
-            logger.info(f"Отправляем запрос на url={self._base_url} с годом={year} и типом недели={week_type}")
-            sd = 0 if week_type == 5 else 1
-            request_url = f"{self._base_url}/api/getdata?year={year}&sd={str(sd)}"
-            response = await self._client.get(request_url)
-            return str(response.json())
-        except Exception as e:
-            logger.error(f"При выполнении запроса на url={request_url} произошла ошибка: {str(e)}")
-            raise e
+        async with AsyncClient() as client:
+            try:
+                url = f"{self._consultant_url}/law/ref/calendar/proizvodstvennye/{year_str}/"
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                }
+                response = await client.get(url, headers=headers)
+                response.raise_for_status()
+                return response.text
+            except Exception as e:
+                logger.error(f"При выполнении GET-запрос на url={url} произошла ошибка: {str(e)}", exc_info=True)
+                raise e

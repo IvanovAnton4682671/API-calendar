@@ -6,7 +6,7 @@ logger = setup_logger("routers.external")
 
 router = APIRouter(
     prefix="/external",
-    tags=["isDayOff"]
+    tags=["External calendar"]
 )
 
 @router.get("/period/{year}", response_model=dict)
@@ -17,7 +17,7 @@ async def get_days_by_year(
 ) -> dict:
     """Получает календарные дни за год
 
-    Получает календарные дни за определённый год, затем формирует и форматирует итоговый список дней,
+    Запрашивает HTML-страницу календаря, затем парсит её,  формирует и форматирует итоговый список дней,
     зависящий от параметров week_type и statistic
     Предполагается использование только в роутинге
 
