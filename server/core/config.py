@@ -22,6 +22,7 @@ class Settings(BaseSettings):
         APP_PORT (int): Порт сервера
         APP_DEBUG (bool): Флаг отладки сервера
         CONSULTANT_CALENDAR_URL (str): URL-адрес Консультанта, который предоставляет данные производственного календаря
+        HHRU_CALENDAR_URL (str): URL-адрес hh.ru, который предоставляет данные производственного календаря
 
     Examples:
         >>>settings = Settings()
@@ -80,6 +81,11 @@ class Settings(BaseSettings):
         ...,
         min_length=1,
         description="URL-адрес Консультанта, который предоставляет данные производственного календаря"
+    )
+    HHRU_CALENDAR_URL: str = Field(
+        ...,
+        min_length=1,
+        description="URL-адрес hh.ru, который предоставляет данные производственного календаря"
     )
 
     @computed_field
