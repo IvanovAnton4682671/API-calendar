@@ -2,9 +2,9 @@ from core.logger import setup_logger
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
-from databases.postgresql import engine, Base
+from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
-from routers import calendar_day, external
+import router
 import uvicorn
 from core.config import settings
 
@@ -51,8 +51,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-app.include_router(calendar_day.router)
-app.include_router(external.router)
+app.include_router(router.router)
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exception: Exception) -> JSONResponse:

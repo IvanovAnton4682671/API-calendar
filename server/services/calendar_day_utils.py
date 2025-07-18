@@ -1,7 +1,7 @@
 from core.logger import setup_logger
-from schemas.calendar_day import BaseCalendarDay, CalendarDayInput, CalendarDayInDB
+from schemas import BaseCalendarDay, CalendarDayInput, CalendarDayInDB
 from typing import Optional, Union
-from models.calendar_day import CalendarDay
+from model import CalendarDay
 from core.consts import DAY_TYPES, WEEK_DAYS
 from datetime import date, timedelta
 

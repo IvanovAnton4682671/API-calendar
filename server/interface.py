@@ -2,7 +2,7 @@ from core.logger import setup_logger
 from core.config import settings
 from httpx import AsyncClient
 
-logger = setup_logger("interfaces.external")
+logger = setup_logger("interface")
 
 class ExternalInterface:
     """Интерфейс взаимодействия с внешними ресурсами

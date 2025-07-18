@@ -1,13 +1,14 @@
 from core.logger import setup_logger
-from fastapi import APIRouter, Query, Depends, HTTPException, status
-from schemas.calendar_day import CalendarDayInDB, CalendarDayInput
+from fastapi import APIRouter, Query, Depends
+from schemas import CalendarDayInDB, CalendarDayInput
 from sqlalchemy.ext.asyncio import AsyncSession
-from databases.postgresql import get_db_connection
+from database import get_db_connection
 from typing import Optional, Union
 from services.calendar_day import CalendarDayService
 from datetime import date
+from services.external import ExternalService
 
-logger = setup_logger("repositories.calendar_day")
+logger = setup_logger("router")
 
 router = APIRouter(tags=["Calendar day"])
 
@@ -124,3 +125,30 @@ async def delete_day(date: date, session: AsyncSession = Depends(get_db_connecti
     else:
         logger.warning(f"Календарный день date={date} не существует")
         return {"message": f"Календарный день date={date} не существует"}
+
+@router.get("/external/period/{year}", response_model=dict)
+async def get_days_by_year(
+    year: int,
+    week_type: int = Query(5, ge=5, le=6, description="Тип рабочей недели"),
+    statistic: bool = Query(False, description="Подробная статистика по выбранному периоду")
+) -> dict:
+    """Получает календарные дни за год
+
+    Запрашивает HTML-страницу календаря, затем парсит её,  формирует и форматирует итоговый список дней,
+    зависящий от параметров week_type и statistic
+    Предполагается использование только в роутинге
+
+    Args:
+        year (int): Год, за который получает список дней
+        week_type (int): Тип рабочей недели
+        statistic (bool): Формат формируемой статистики
+
+    Returns:
+        dict: Словарь со всей информацией
+    """
+
+    logger.info(f"Пробуем получить календарные дни по параметрам: год={year}, рабочая неделя={week_type}")
+    external_service = ExternalService()
+    result = await external_service.get_days_by_year(year, week_type, statistic)
+    logger.info(f"Календарные дни (год={year}, рабочая неделя={week_type}) успешно получены")
+    return result

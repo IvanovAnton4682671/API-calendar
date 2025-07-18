@@ -1,12 +1,12 @@
 from core.logger import setup_logger
 from sqlalchemy.ext.asyncio import AsyncSession
-from models.calendar_day import CalendarDay
+from model import CalendarDay
 from typing import Optional
-from schemas.calendar_day import CalendarDayInDB
+from schemas import CalendarDayInDB
 from datetime import date
 from sqlalchemy import select
 
-logger = setup_logger("repositories.calendar_day")
+logger = setup_logger("repo")
 
 class CalendarDayRepository:
     """Репозиторий CRUD-логики календарных дней

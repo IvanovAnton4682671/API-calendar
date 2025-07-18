@@ -1,6 +1,6 @@
 from core.logger import setup_logger
 from services.calendar_day_utils import period_parse
-from interfaces.external import ExternalInterface
+from interface import ExternalInterface
 from services.external_utils import parse_consultant_calendar, parse_hhru_calendar, get_statistic
 from datetime import datetime
 

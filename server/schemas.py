@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, field_validator
 import datetime
 from typing import Optional
 
-logger = setup_logger("schemas.calendar_day")
+logger = setup_logger("schemas")
 
 def validate_type_text(type_text: str) -> str:
     """Валидация поля type_text

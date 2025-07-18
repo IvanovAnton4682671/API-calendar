@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from core.config import settings
 from typing import AsyncGenerator
 
-logger = setup_logger("databases.postgresql")
+logger = setup_logger("database")
 
 Base = declarative_base()
 
