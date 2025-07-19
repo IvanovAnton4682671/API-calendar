@@ -45,10 +45,10 @@ def parse_consultant_calendar(response_text: str, year: int, week_type: int) -> 
             for row in table_body.find_all("tr"):
                 for cell in row.find_all("td"):
                     cell_classes = cell.get("class", [])
-                    if cell_classes == "inactively": #пропускаем пустую ячейку таблицы
+                    if cell_classes == "inactively":
                         continue
                     day_str = cell.get_text(strip=True)
-                    day_text = "".join(d for d in day_str if d.isdigit()) #отбрасываем все прочие символы кроме цифр
+                    day_text = "".join(d for d in day_str if d.isdigit())
                     if not day_text:
                         continue
                     day_number = int(day_text)
