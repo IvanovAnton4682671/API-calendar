@@ -21,6 +21,7 @@ class Settings(BaseSettings):
         APP_HOST (str): Хост сервера
         APP_PORT (int): Порт сервера
         APP_DEBUG (bool): Флаг отладки сервера
+        API_TOKEN (SecretStr): Секретный токен для работы с БД
         CONSULTANT_CALENDAR_URL (str): URL-адрес Консультанта, который предоставляет данные производственного календаря
         HHRU_CALENDAR_URL (str): URL-адрес hh.ru, который предоставляет данные производственного календаря
 
@@ -75,6 +76,10 @@ class Settings(BaseSettings):
     APP_DEBUG: bool = Field(
         ...,
         description="Флаг отладки сервера"
+    )
+    API_TOKEN: SecretStr = Field(
+        ...,
+        description="Секретный токен для работы с БД"
     )
 
     CONSULTANT_CALENDAR_URL: str = Field(

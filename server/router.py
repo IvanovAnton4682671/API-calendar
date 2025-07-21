@@ -1,4 +1,5 @@
 from core.logger import setup_logger
+from security import verify_auth
 from fastapi import APIRouter, Query, Depends
 from schemas import CalendarDayInDB, CalendarDayInput
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +13,7 @@ logger = setup_logger("router")
 
 router = APIRouter(tags=["Calendar day"])
 
-@router.post("/date", response_model=CalendarDayInDB)
+@router.post("/date", dependencies=[Depends(verify_auth)], response_model=CalendarDayInDB)
 async def create_day(
     day_data: CalendarDayInput,
     note: Optional[str] = Query(None, description="Дополнительное описание дня"),
@@ -69,7 +70,7 @@ async def get_days_by_period(
     logger.info(f"Календарные дни по периоду={period} успешно получены")
     return result
 
-@router.put("/date/{date}", response_model=Union[CalendarDayInDB, dict])
+@router.put("/date/{date}", dependencies=[Depends(verify_auth)], response_model=Union[CalendarDayInDB, dict])
 async def update_day(
     date: date,
     day_data: CalendarDayInput,
@@ -101,7 +102,7 @@ async def update_day(
         logger.warning(f"Календарный день date={date} не существует")
         return {"message": f"Календарный день date={date} не существует"}
 
-@router.delete("/date/{date}", response_model=dict)
+@router.delete("/date/{date}", dependencies=[Depends(verify_auth)], response_model=dict)
 async def delete_day(date: date, session: AsyncSession = Depends(get_db_connection)) -> dict:
     """Удаляет календарный день по дате
 
