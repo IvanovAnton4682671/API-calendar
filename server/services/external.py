@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from model import CalendarDay
 from services.calendar_day_utils import assemble_day, parse_date
 from schemas import CalendarDayInput
+from fastapi import HTTPException, status
 
 logger = setup_logger("service.external")
 
@@ -32,7 +33,7 @@ class ExternalService:
 
         self._repo = CalendarDayRepository(session)
 
-    async def get_days_by_year(self, year: int, week_type: int, statistic: bool) -> dict:
+    async def parse_external_calendar(self, year: int, week_type: int, statistic: bool) -> dict:
         """Формирует список календарных дней из внешних данных
 
         Получает список календарных дней, полученных после парсинга HTML-страницы Консультанта
@@ -59,7 +60,12 @@ class ExternalService:
         try:
             logger.info(f"Пробуем сформировать календарь (year={year}, week_type={week_type}, statistic={statistic})")
             if year > datetime.now().year or year < 2017:
-                raise ValueError(f"Год должен быть от 2017 и до текущего включительно, но получен {year}")
+                desc = f"Год должен быть от 2017 и до текущего включительно, но получен {year}"
+                logger.warning(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=desc
+                )
             year_str = str(year)
             date_start, date_end, period_name = period_parse(year_str)
             external_interface = ExternalInterface()
@@ -80,13 +86,16 @@ class ExternalService:
                 result.update(add_statistic)
             result["days"] = correct_external_days
             return result
-        except ValueError as e:
-            raise e
         except Exception as e:
             logger.error(f"При получении календарных дней от Консультанта (year={year}, week_type={week_type}) произошла ошибка: {str(e)}", exc_info=True)
             try:
                 if year > datetime.now().year or year < 2020:
-                    raise ValueError(f"Год должен быть от 2020 и до текущего включительно, но получен {year}")
+                    desc = f"Год должен быть от 2020 и до текущего включительно, но получен {year}"
+                    logger.warning(desc)
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=desc
+                    )
                 year_str = str(year)
                 date_start, date_end, period_name = period_parse(year_str)
                 external_interface = ExternalInterface()
@@ -103,10 +112,7 @@ class ExternalService:
                     result.update(add_statistic)
                 result["days"] = correct_external_days
                 return result
-            except ValueError as e:
-                raise e
             except Exception as e:
-                logger.error(f"При получении календарных дней от hh.ru (year={year}, week_type={week_type}) произошла ошибка: {str(e)}", exc_info=True)
                 raise e
 
     async def insert_production_calendar(self, json_calendar: dict) -> int:
@@ -114,7 +120,12 @@ class ExternalService:
             logger.info(f"Пробуем вставить производственный календарь в БД")
             days_list: list[dict] = json_calendar.get("days")
             if not days_list:
-                raise ValueError("Некорректный формат производственного календаря!")
+                desc = "Некорректный формат производственного календаря! Требуется {..., days: [...]}"
+                logger.warning(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=desc
+                )
             list_correct_days: list[CalendarDay] = []
             for day in days_list:
                 day_date = parse_date(day.get("date"))
@@ -126,5 +137,4 @@ class ExternalService:
             inserted_days = await self._repo.insert_production_calendar(list_correct_days)
             return inserted_days
         except Exception as e:
-            logger.error(f"При вставке производственного календаря произошла ошибка: {str(e)}", exc_info=True)
             raise e

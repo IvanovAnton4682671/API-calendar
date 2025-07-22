@@ -1,6 +1,6 @@
 from core.logger import setup_logger
 from security import verify_auth
-from fastapi import APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends, HTTPException, status
 from schemas import CalendarDayInDB, CalendarDayInput
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db_connection
@@ -33,11 +33,14 @@ async def create_day(
         CalendarDayInDB: Представление созданного дня в БД
     """
 
-    logger.info(f"Пробуем создать календарный день с данными: day_data={day_data}, note={note}")
-    day_service = CalendarDayService(session)
-    created_day = await day_service.create_day(day_data, note)
-    logger.info(f"Календарный день успешно создан (после валидации): {created_day}")
-    return created_day
+    try:
+        logger.info(f"Пробуем создать календарный день с данными: day_data={day_data}, note={note}")
+        day_service = CalendarDayService(session)
+        created_day = await day_service.create_day(day_data, note)
+        logger.info(f"Календарный день успешно создан (после валидации): {created_day}")
+        return created_day
+    except Exception as e:
+        raise e
 
 @router.get("/period/{period}", response_model=dict)
 async def get_days_by_period(
@@ -64,11 +67,14 @@ async def get_days_by_period(
         dict: Словарь со всей информацией
     """
 
-    logger.info(f"Пробуем получить календарные дни по периоду={period}")
-    day_service = CalendarDayService(session)
-    result = await day_service.get_days_by_period(period, compact, week_type, statistic)
-    logger.info(f"Календарные дни по периоду={period} успешно получены")
-    return result
+    try:
+        logger.info(f"Пробуем получить календарные дни по периоду={period}")
+        day_service = CalendarDayService(session)
+        result = await day_service.get_days_by_period(period, compact, week_type, statistic)
+        logger.info(f"Календарные дни по периоду={period} успешно получены")
+        return result
+    except Exception as e:
+        raise e
 
 @router.put("/date/{date}", dependencies=[Depends(verify_auth)], response_model=Union[CalendarDayInDB, dict])
 async def update_day(
@@ -92,15 +98,14 @@ async def update_day(
         Union[CalendarDayInDB, dict]: Возвращает либо обновлённый день, либо пустой словарь (если день не существует)
     """
 
-    logger.info(f"Пробуем обновить календарный день date={date} данными: day_data={day_data}, note={note}")
-    day_service = CalendarDayService(session)
-    updated_day = await day_service.update_day(date, day_data, note)
-    if updated_day:
+    try:
+        logger.info(f"Пробуем обновить календарный день date={date} данными: day_data={day_data}, note={note}")
+        day_service = CalendarDayService(session)
+        updated_day = await day_service.update_day(date, day_data, note)
         logger.info(f"Календарный день date={date} успешно обновлён (после валидации): {updated_day}")
         return updated_day
-    else:
-        logger.warning(f"Календарный день date={date} не существует")
-        return {"message": f"Календарный день date={date} не существует"}
+    except Exception as e:
+        raise e
 
 @router.delete("/date/{date}", dependencies=[Depends(verify_auth)], response_model=dict)
 async def delete_day(date: date, session: AsyncSession = Depends(get_db_connection)) -> dict:
@@ -117,24 +122,23 @@ async def delete_day(date: date, session: AsyncSession = Depends(get_db_connecti
         dict: Словарь со статусом удаления дня
     """
 
-    logger.info(f"Пробуем удалить календарный день date={date}")
-    day_service = CalendarDayService(session)
-    deleted_status = await day_service.delete_day(date)
-    if deleted_status:
+    try:
+        logger.info(f"Пробуем удалить календарный день date={date}")
+        day_service = CalendarDayService(session)
+        deleted_status = await day_service.delete_day(date)
         logger.info(f"Календарный день date={date} успешно удалён")
         return {"message": f"Календарный день date={date} успешно удалён"}
-    else:
-        logger.warning(f"Календарный день date={date} не существует")
-        return {"message": f"Календарный день date={date} не существует"}
+    except Exception as e:
+        raise e
 
 @router.get("/external/period/{year}", response_model=dict)
-async def get_days_by_year(
+async def parse_external_calendar(
     year: int,
     week_type: int = Query(5, ge=5, le=6, description="Тип рабочей недели"),
     statistic: bool = Query(False, description="Подробная статистика по выбранному периоду"),
     session: AsyncSession = Depends(get_db_connection)
 ) -> dict:
-    """Получает календарные дни за год
+    """Парсит календарные дни за год
 
     Запрашивает HTML-страницу календаря, затем парсит её,  формирует и форматирует итоговый список дней,
     зависящий от параметров week_type и statistic
@@ -149,15 +153,34 @@ async def get_days_by_year(
         dict: Словарь со всей информацией
     """
 
-    logger.info(f"Пробуем получить календарные дни по параметрам: год={year}, рабочая неделя={week_type}")
-    external_service = ExternalService(session)
-    result = await external_service.get_days_by_year(year, week_type, statistic)
-    logger.info(f"Календарные дни (год={year}, рабочая неделя={week_type}) успешно получены")
-    return result
+    try:
+        logger.info(f"Пробуем получить календарные дни по параметрам: год={year}, рабочая неделя={week_type}")
+        external_service = ExternalService(session)
+        result = await external_service.parse_external_calendar(year, week_type, statistic)
+        logger.info(f"Календарные дни (год={year}, рабочая неделя={week_type}) успешно получены")
+        return result
+    except Exception as e:
+        raise e
 
 @router.post("/external/insert_production_calendar", dependencies=[Depends(verify_auth)], response_model=dict)
 async def insert_production_calendar(json_calendar: dict, session: AsyncSession = Depends(get_db_connection)) -> dict:
-    logger.info(f"Пробуем вставить производственный календарь в БД")
-    external_service = ExternalService(session)
-    result = await external_service.insert_production_calendar(json_calendar)
-    return {"message": f"Вставка прошла успешно, было добавлено/обновлено {result} календарных дней"}
+    """Вставляет в БД производственный календарь
+
+    Вставляет в БД за раз большое количество календарных дней. При наличии дня заменяет его поля на новые
+    Предполагается использование только в роутинге
+
+    Args:
+        json_calendar (dict): Производственный календарь в json-формате
+        session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
+
+    Returns:
+        dict: Возвращает количество вставленных/изменённых дней
+    """
+
+    try:
+        logger.info(f"Пробуем вставить производственный календарь в БД")
+        external_service = ExternalService(session)
+        result = await external_service.insert_production_calendar(json_calendar)
+        return {"message": f"Вставка прошла успешно, было добавлено/обновлено {result} календарных дней"}
+    except Exception as e:
+        raise e

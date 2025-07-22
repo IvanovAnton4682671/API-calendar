@@ -1,6 +1,7 @@
 from core.logger import setup_logger
 from core.config import settings
 from httpx import AsyncClient
+from fastapi import HTTPException, status
 
 logger = setup_logger("interface")
 
@@ -54,8 +55,12 @@ class ExternalInterface:
                 response.raise_for_status()
                 return response.text
             except Exception as e:
-                logger.error(f"При выполнении GET-запрос на url={url} произошла ошибка: {str(e)}", exc_info=True)
-                raise e
+                desc = f"При выполнении GET-запрос на url={url} произошла ошибка: {str(e)}"
+                logger.error(desc, exc_info=True)
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=desc
+                )
 
     async def get_hhru_calendar(self, year_str: str) -> str:
         """GET-запрос к hh.ru
@@ -86,5 +91,9 @@ class ExternalInterface:
                 response.raise_for_status()
                 return response.text
             except Exception as e:
-                logger.error(f"При выполнении GET-запроса на url={url} произошла ошибка: {str(e)}", exc_info=True)
-                raise e
+                desc = f"При выполнении GET-запрос на url={url} произошла ошибка: {str(e)}"
+                logger.error(desc, exc_info=True)
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=desc
+                )

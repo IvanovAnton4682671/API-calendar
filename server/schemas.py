@@ -3,6 +3,7 @@ from core.consts import DAY_TYPES, WEEK_DAYS
 from pydantic import BaseModel, Field, field_validator
 import datetime
 from typing import Optional
+from fastapi import HTTPException, status
 
 logger = setup_logger("schemas")
 
@@ -33,12 +34,18 @@ def validate_type_text(type_text: str) -> str:
         if type_text not in vars:
             desc = f"Поле type_text может принимать значения {vars}, но принимает значение {type_text}"
             logger.warning(desc)
-            raise ValueError(desc)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=desc
+            )
         return type_text
     except Exception as e:
         desc = f"При валидации поля type_text={type_text} произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def validate_week_day(week_day: str) -> str:
     """Валидация поля week_day
@@ -67,12 +74,18 @@ def validate_week_day(week_day: str) -> str:
         if week_day not in vars:
             desc = f"Поле week_day может принимать значения {vars}, но принимает значение {week_day}"
             logger.warning(desc)
-            raise ValueError(desc)
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=desc
+            )
         return week_day
     except Exception as e:
         desc = f"При валидации поля week_day={week_day} произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 class BaseCalendarDay(BaseModel):
     """Схема обычного календарного дня

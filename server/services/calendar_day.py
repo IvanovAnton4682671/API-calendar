@@ -5,6 +5,7 @@ from schemas import CalendarDayInput, CalendarDayInDB
 from typing import Optional
 from services.calendar_day_utils import assemble_day, period_parse, create_base_days, merge_days, formatting_days, get_statistic
 from datetime import date
+from fastapi import HTTPException, status
 
 logger = setup_logger("services.calendar_day")
 
@@ -59,7 +60,6 @@ class CalendarDayService:
             logger.info(f"Календарный день успешно создан (после валидации): {created_day}")
             return created_day
         except Exception as e:
-            logger.error(f"При создании календарного дня с данными: day_data={day_data}, note={note} произошла ошибка: {str(e)}", exc_info=True)
             raise e
 
     async def get_days_by_period(self, period: str, compact: bool, week_type: int, statistic: bool) -> dict:
@@ -106,10 +106,9 @@ class CalendarDayService:
             result["days"] = result_days
             return result
         except Exception as e:
-            logger.error(f"При получении календарных дней по периоду={period} произошла ошибка: {str(e)}", exc_info=True)
             raise e
 
-    async def update_day(self, date: date, day_data: CalendarDayInput, note: Optional[str]) -> Optional[CalendarDayInDB]:
+    async def update_day(self, date: date, day_data: CalendarDayInput, note: Optional[str]) -> CalendarDayInDB:
         """Обновляет календарный день по дате
 
         Обновляет календарный день по дате date данными day_data и note
@@ -134,14 +133,9 @@ class CalendarDayService:
             logger.info(f"Пробуем обновить календарный день date={date} данными: day_data={day_data}, note={note}")
             new_day = assemble_day(day_data, note)
             updated_day = await self._repo.update_day(date, new_day)
-            if updated_day:
-                logger.info(f"Календарный день date={date} успешно обновлён (после валидации): {updated_day}")
-                return updated_day
-            else:
-                logger.warning(f"Календарный день date={date} не существует")
-                return None
+            logger.info(f"Календарный день date={date} успешно обновлён (после валидации): {updated_day}")
+            return updated_day
         except Exception as e:
-            logger.error(f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
             raise e
 
     async def delete_day(self, date: date) -> bool:
@@ -166,12 +160,7 @@ class CalendarDayService:
         try:
             logger.info(f"Пробуем удалить календарный день date={date}")
             deleted_status = await self._repo.delete_day(date)
-            if deleted_status:
-                logger.info(f"Календарный день date={date} успешно удалён")
-                return True
-            else:
-                logger.warning(f"Календарный день date={date} не существует")
-                return False
+            logger.info(f"Календарный день date={date} успешно удалён")
+            return True
         except Exception as e:
-            logger.error(f"При удалении календарного дня date={date} произошла ошибка: {str(e)}", exc_info=True)
             raise e

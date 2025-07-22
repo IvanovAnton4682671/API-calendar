@@ -6,6 +6,7 @@ from schemas import CalendarDayInDB
 from datetime import date
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
+from fastapi import HTTPException, status
 
 logger = setup_logger("repo")
 
@@ -61,10 +62,13 @@ class CalendarDayRepository:
             logger.info(f"Календарный день успешно создан (перед валидацией): {day_data}")
             return CalendarDayInDB.model_validate(day_data)
         except Exception as e:
-            desc = f"При создании календарного дня произошла ошибка: {str(e)}"
+            desc = f"При создании дня date={day_data.date} произошла ошибка: {str(e)}"
             logger.error(desc, exc_info=True)
             await self._session.rollback()
-            raise Exception(desc)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=desc
+            )
 
     async def insert_production_calendar(self, days_list: list[CalendarDay]) -> int:
         """Вставляет производственный календарь
@@ -107,10 +111,8 @@ class CalendarDayRepository:
             logger.info(f"Вставка прошла успешно, было добавлено/обновлено {inserted} календарных дней")
             return inserted
         except Exception as e:
-            desc = f"При вставке производственного календаря произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
             await self._session.rollback()
-            raise Exception(desc)
+            raise e
 
     async def get_days_by_period(self, date_start: date, date_end: date) -> list[CalendarDayInDB]:
         """Получает календарные дни по периоду
@@ -141,12 +143,14 @@ class CalendarDayRepository:
                 logger.info(f"Календарные дни по периоду date_start={date_start}, date_end={date_end} успешно получены, их {len(list_of_days)}")
                 return [CalendarDayInDB.model_validate(day) for day in list_of_days]
             else:
-                logger.warning(f"Календарные дни по периоду date_start={date_start}, date_end={date_end} отсутствуют")
-                return []
+                desc = f"Календарные дни по периоду date_start={date_start}, date_end={date_end} отсутствуют"
+                logger.warning(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=desc
+                )
         except Exception as e:
-            desc = f"При получении календарных дней по периоду date_start={date_start}, date_end={date_end} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise e
 
     async def get_day_by_date(self, date: date) -> Optional[CalendarDay]:
         """Получает календарный день по дате
@@ -176,12 +180,14 @@ class CalendarDayRepository:
                 logger.info(f"Календарный день date={date} успешно получен: {received_day}")
                 return received_day
             else:
-                logger.warning(f"Календарный день date={date} не существует")
-                return None
+                desc = f"Календарный день date={date} не существует"
+                logger.warning(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=desc
+                )
         except Exception as e:
-            desc = f"При получении календарного дня date={date} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise e
 
     async def update_day(self, date: date, day_data: CalendarDay) -> Optional[CalendarDayInDB]:
         """Обновляет календарный день по дате
@@ -217,13 +223,15 @@ class CalendarDayRepository:
                 logger.info(f"Календарный день date={date} успешно обновлён (перед валидацией): {received_day}")
                 return CalendarDayInDB.model_validate(received_day)
             else:
-                logger.warning(f"Календарный день date={date} не существует")
-                return None
+                desc = f"Календарный день date={date} не существует"
+                logger.warning(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=desc
+                )
         except Exception as e:
-            desc = f"При обновлении календарного дня date={date} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
             await self._session.rollback()
-            raise Exception(desc)
+            raise e
 
     async def delete_day(self, date: date) -> bool:
         """Удаляет календарный день по дате
@@ -253,9 +261,12 @@ class CalendarDayRepository:
                 logger.info(f"Календарный день date={date} успешно удалён")
                 return True
             else:
-                logger.warning(f"Календарный день date={date} не существует")
-                return False
+                desc = f"Календарный день date={date} не существует"
+                logger.warning(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=desc
+                )
         except Exception as e:
-            logger.error(f"При удалении календарного дня произошла ошибка: {str(e)}", exc_info=True)
             await self._session.rollback()
-            return False
+            raise e

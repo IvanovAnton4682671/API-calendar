@@ -1,6 +1,7 @@
 from core.logger import setup_logger
 from pydantic_settings import BaseSettings
 from pydantic import Field, SecretStr, computed_field
+from fastapi import HTTPException, status
 
 logger = setup_logger("core.config")
 
@@ -121,7 +122,10 @@ class Settings(BaseSettings):
         except Exception as e:
             desc = f"При сборке адреса подключения к БД произошла ошибка: {str(e)}"
             logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=desc
+            )
 
     class Config:
         """Класс дополнительных настроек

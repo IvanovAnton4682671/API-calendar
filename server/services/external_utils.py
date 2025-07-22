@@ -2,6 +2,7 @@ from core.logger import setup_logger
 from bs4 import BeautifulSoup
 from core.consts import MONTHS, OFFICIAL_HOLIDAYS, WEEK_DAYS, DAY_TYPES
 from datetime import date
+from fastapi import HTTPException, status
 
 logger = setup_logger("services.external_utils")
 
@@ -78,8 +79,12 @@ def parse_consultant_calendar(response_text: str, year: int, week_type: int) -> 
                     correct_external_days.append(correct_day)
         return correct_external_days
     except Exception as e:
-        logger.error(f"При парсинге календаря Консультанта произошла ошибка: {str(e)}", exc_info=True)
-        raise e
+        desc = f"При парсинге календаря Консультанта произошла ошибка: {str(e)}"
+        logger.error(desc, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def parse_hhru_calendar(response_text: str, year: int, week_type: int) -> list[dict]:
     """Парсит HTML для получения календарных дней
@@ -169,8 +174,12 @@ def parse_hhru_calendar(response_text: str, year: int, week_type: int) -> list[d
                     correct_external_days.append(correct_day)
         return correct_external_days
     except Exception as e:
-        logger.error(f"При парсинге календаря hh.ru произошла ошибка: {str(e)}", exc_info=True)
-        raise e
+        desc = f"При парсинге календаря hh.ru произошла ошибка: {str(e)}"
+        logger.error(desc, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def get_statistic(correct_external_days: list[dict]) -> dict:
     """Формирует статистику
@@ -209,5 +218,9 @@ def get_statistic(correct_external_days: list[dict]) -> dict:
             "holidays": holidays
         }
     except Exception as e:
-        logger.error(f"При формировании статистики произошла ошибка: {str(e)}", exc_info=True)
-        raise e
+        desc = f"При формировании статистики произошла ошибка: {str(e)}"
+        logger.error(desc, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )

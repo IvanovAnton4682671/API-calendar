@@ -4,6 +4,7 @@ from typing import Optional, Union
 from model import CalendarDay
 from core.consts import DAY_TYPES, WEEK_DAYS
 from datetime import date, timedelta
+from fastapi import HTTPException, status
 
 logger = setup_logger("services.calendar_day_utils")
 
@@ -39,7 +40,10 @@ def assemble_day(day_data: CalendarDayInput, note: Optional[str]) -> CalendarDay
     except Exception as e:
         desc = f"При сборке CalendarDay (из полей: day_data={day_data}, note={note}) произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def parse_date(date_str: str) -> date:
         """Парсит строковую дату в date
@@ -66,15 +70,16 @@ def parse_date(date_str: str) -> date:
             if len(parts) != 3:
                 desc = f"Строковая дата должна иметь вид ДД.ММ.ГГГГ, но имеет вид {date_str}"
                 logger.warning(desc)
-                raise ValueError(desc)
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=desc
+                )
             day = int(parts[0])
             month = int(parts[1])
             year = int(parts[2])
             return date(year, month, day)
         except Exception as e:
-            desc = f"При парсинге строковой даты={date_str} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise e
 
 def period_parse(period: str) -> tuple[date, date, str]:
     """Парсит строку периода в даты начала и конца
@@ -109,29 +114,36 @@ def period_parse(period: str) -> tuple[date, date, str]:
                 if len(parts) != 2:
                     desc = f"Произвольный период должен иметь вид ДД.ММ.ГГГГ-ДД.ММ.ГГГГ, но имеет вид {period}"
                     logger.warning(desc)
-                    raise ValueError(desc)
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=desc
+                    )
                 date_start = parse_date(parts[0])
                 date_end = parse_date(parts[1])
                 if date_start > date_end:
                     date_start, date_end = date_end, date_start
                 return date_start, date_end, "Произвольный период"
         except Exception as e:
-            desc = f"При парсинге произвольного периода={period} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise e
         #квартал QNГГГГ
         try:
             if period.startswith("Q"):
                 if len(period) != 6 or not period[1:].isdigit():
                     desc = f"Квартал должен иметь вид QNГГГГ, но имеет вид {period}"
                     logger.warning(desc)
-                    raise ValueError(desc)
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=desc
+                    )
                 quarter = int(period[1])
                 year = int(period[2:])
                 if quarter < 1 or quarter > 4:
                     desc = f"Квартал должен быть от 1 до 4, но получен {str(quarter)}"
                     logger.warning(desc)
-                    raise ValueError(desc)
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=desc
+                    )
                 start_month = 3 * (quarter - 1) + 1
                 end_month = start_month + 2
                 date_start = date(year, start_month, 1)
@@ -141,9 +153,7 @@ def period_parse(period: str) -> tuple[date, date, str]:
                     date_end = date(year, end_month + 1, 1) - timedelta(days=1)
                 return date_start, date_end, "Квартал"
         except Exception as e:
-            desc = f"При парсинге квартала={period} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise e
         #сутки ДД.ММ.ГГГГ
         try:
             if period.count(".") == 2:
@@ -152,7 +162,10 @@ def period_parse(period: str) -> tuple[date, date, str]:
         except Exception as e:
             desc = f"При парсинге суток={period} произошла ошибка: {str(e)}"
             logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=desc
+            )
         #месяц ММ.ГГГГ
         try:
             if period.count(".") == 1:
@@ -160,13 +173,19 @@ def period_parse(period: str) -> tuple[date, date, str]:
                 if len(parts) != 2 or len(parts[0]) != 2 or len(parts[1]) != 4:
                     desc = f"Месяц должен иметь вид ММ.ГГГГ, но имеет вид {period}"
                     logger.warning(desc)
-                    raise ValueError(desc)
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=desc
+                    )
                 month = int(parts[0])
                 year = int(parts[1])
                 if month < 1 or month > 12:
                     desc = f"Месяц должен быть от 01 до 12, но получен {month}"
                     logger.warning(desc)
-                    raise ValueError(desc)
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                        detail=desc
+                    )
                 date_start = date(year, month, 1)
                 if month == 12:
                     date_end = date(year, month, 1)
@@ -174,9 +193,7 @@ def period_parse(period: str) -> tuple[date, date, str]:
                     date_end = date(year, month + 1, 1) - timedelta(days=1)
                 return date_start, date_end, "Месяц"
         except Exception as e:
-            desc = f"При парсинге месяца={period} произошла ошибка: {str(e)}"
-            logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise e
         #год ГГГГ
         try:
             if len(period) == 4 and period.isdigit():
@@ -187,14 +204,18 @@ def period_parse(period: str) -> tuple[date, date, str]:
         except Exception as e:
             desc = f"При парсинге года={period} произошла ошибка: {str(e)}"
             logger.error(desc, exc_info=True)
-            raise Exception(desc)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=desc
+            )
         desc = f"Получен неизвестный формат периода={period}"
         logger.warning(desc)
-        raise ValueError(desc)
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=desc
+        )
     except Exception as e:
-        desc = f"При парсинге period={period} произошла ошибка: {str(e)}"
-        logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise e
 
 def create_base_days(date_start: date, date_end: date, week_type: int) -> list[BaseCalendarDay]:
     """Создаёт обычный календарь по периоду
@@ -243,7 +264,10 @@ def create_base_days(date_start: date, date_end: date, week_type: int) -> list[B
     except Exception as e:
         desc = f"При создании обычного календаря произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def merge_days(base_days: list[BaseCalendarDay], db_days: list[CalendarDayInDB]) -> list[Union[BaseCalendarDay, CalendarDayInDB]]:
     """Перезаписывает обычные календарные дни днями из БД
@@ -277,7 +301,10 @@ def merge_days(base_days: list[BaseCalendarDay], db_days: list[CalendarDayInDB])
     except Exception as e:
         desc = f"При перезаписи дней произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def formatting_days(merged_days: list[Union[BaseCalendarDay, CalendarDayInDB]], compact: bool, week_type: int) -> list[Union[BaseCalendarDay, CalendarDayInDB]]:
     """Форматирует объединённый список дней
@@ -331,7 +358,10 @@ def formatting_days(merged_days: list[Union[BaseCalendarDay, CalendarDayInDB]], 
     except Exception as e:
         desc = f"При форматировании объединённого списка дней произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
 
 def get_statistic(merged_days: list[Union[BaseCalendarDay, CalendarDayInDB]]) -> dict:
     """Дополнительная статистика списка дней
@@ -371,4 +401,7 @@ def get_statistic(merged_days: list[Union[BaseCalendarDay, CalendarDayInDB]]) ->
     except Exception as e:
         desc = f"При формировании статистик произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
