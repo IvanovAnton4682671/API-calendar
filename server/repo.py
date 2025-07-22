@@ -5,6 +5,7 @@ from typing import Optional
 from schemas import CalendarDayInDB
 from datetime import date
 from sqlalchemy import select
+from sqlalchemy.dialects.postgresql import insert
 
 logger = setup_logger("repo")
 
@@ -61,6 +62,52 @@ class CalendarDayRepository:
             return CalendarDayInDB.model_validate(day_data)
         except Exception as e:
             desc = f"При создании календарного дня произошла ошибка: {str(e)}"
+            logger.error(desc, exc_info=True)
+            await self._session.rollback()
+            raise Exception(desc)
+
+    async def insert_production_calendar(self, days_list: list[CalendarDay]) -> int:
+        """Вставляет производственный календарь
+
+        Вставляет в БД большое количество календарных дней за раз.
+        При конфликте (день существует) обновляет поля дня
+
+        Args:
+            self (Self@CalendarDayRepository): Экземпляр класса
+            days_list (list[CalendarDay]): Список календарных дней
+
+        Returns:
+            int: Кол-во успешных вставок в БД
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Example:
+            >>>inserted_days = await repo.insert_production_calendar([CalendarDay(...),...])
+        """
+
+        try:
+            logger.info(f"Пробуем вставить в БД {len(days_list)} календарных дней")
+            query = insert(CalendarDay).values([{
+                "date": day.date,
+                "type_id": day.type_id,
+                "type_text": day.type_text,
+                "note": day.note,
+                "week_day": day.week_day
+            } for day in days_list])
+            query = query.on_conflict_do_update(index_elements=["date"], set_={
+                "type_id": query.excluded.type_id,
+                "type_text": query.excluded.type_text,
+                "note": query.excluded.note,
+                "week_day": query.excluded.week_day
+            })
+            await self._session.execute(query)
+            await self._session.commit()
+            inserted = len(days_list)
+            logger.info(f"Вставка прошла успешно, было добавлено/обновлено {inserted} календарных дней")
+            return inserted
+        except Exception as e:
+            desc = f"При вставке производственного календаря произошла ошибка: {str(e)}"
             logger.error(desc, exc_info=True)
             await self._session.rollback()
             raise Exception(desc)

@@ -3,6 +3,11 @@ from services.calendar_day_utils import period_parse
 from interface import ExternalInterface
 from services.external_utils import parse_consultant_calendar, parse_hhru_calendar, get_statistic
 from datetime import datetime
+from repo import CalendarDayRepository
+from sqlalchemy.ext.asyncio import AsyncSession
+from model import CalendarDay
+from services.calendar_day_utils import assemble_day, parse_date
+from schemas import CalendarDayInput
 
 logger = setup_logger("service.external")
 
@@ -15,16 +20,17 @@ class ExternalService:
         >>>external_service = ExternalService()
     """
 
-    def __init__(self) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         """Конструктор класса
 
         Создаёт экземпляр класса для работы с внешним источником данных
 
         Args:
             self (Self@ExternalService): Экземпляр класса
+            session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
         """
 
-        pass
+        self._repo = CalendarDayRepository(session)
 
     async def get_days_by_year(self, year: int, week_type: int, statistic: bool) -> dict:
         """Формирует список календарных дней из внешних данных
@@ -102,3 +108,23 @@ class ExternalService:
             except Exception as e:
                 logger.error(f"При получении календарных дней от hh.ru (year={year}, week_type={week_type}) произошла ошибка: {str(e)}", exc_info=True)
                 raise e
+
+    async def insert_production_calendar(self, json_calendar: dict) -> int:
+        try:
+            logger.info(f"Пробуем вставить производственный календарь в БД")
+            days_list: list[dict] = json_calendar.get("days")
+            if not days_list:
+                raise ValueError("Некорректный формат производственного календаря!")
+            list_correct_days: list[CalendarDay] = []
+            for day in days_list:
+                day_date = parse_date(day.get("date"))
+                day_type_id = int(day.get("type_id"))
+                day_note = day.get("note", None)
+                day_data = CalendarDayInput(date=day_date, type_id=day_type_id)
+                correct_day = assemble_day(day_data, day_note)
+                list_correct_days.append(correct_day)
+            inserted_days = await self._repo.insert_production_calendar(list_correct_days)
+            return inserted_days
+        except Exception as e:
+            logger.error(f"При вставке производственного календаря произошла ошибка: {str(e)}", exc_info=True)
+            raise e

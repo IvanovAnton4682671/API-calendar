@@ -41,32 +41,7 @@ def assemble_day(day_data: CalendarDayInput, note: Optional[str]) -> CalendarDay
         logger.error(desc, exc_info=True)
         raise Exception(desc)
 
-def period_parse(period: str) -> tuple[date, date, str]:
-    """Парсит строку периода в даты начала и конца
-
-    Парсит строку периода в даты начала и конца, а также возвращает наименование периода
-    Поддерживаемые форматы периода:
-    - Год: ГГГГ
-    - Квартал: QNГГГГ
-    - Месяц: ММ.ГГГГ
-    - Сутки: ДД.ММ.ГГГГ
-    - Произвольный период: ДД.ММ.ГГГГ-ДД.ММ.ГГГГ
-
-    Args:
-        period (str): Временной период
-
-    Returns:
-        tuple[date, date, str]: Даты начала и конца, а также наименование периода
-
-    Raises:
-        ValueError: При некорректных данных
-        Exception: В непредвиденной ситуации
-
-    Example:
-        >>>date_start, date_end, period_name = period_parse("2025")
-    """
-
-    def parse_date(date_str: str) -> date:
+def parse_date(date_str: str) -> date:
         """Парсит строковую дату в date
 
         Парсит строковую дату формата ДД.ММ.ГГГГ в date
@@ -100,6 +75,31 @@ def period_parse(period: str) -> tuple[date, date, str]:
             desc = f"При парсинге строковой даты={date_str} произошла ошибка: {str(e)}"
             logger.error(desc, exc_info=True)
             raise Exception(desc)
+
+def period_parse(period: str) -> tuple[date, date, str]:
+    """Парсит строку периода в даты начала и конца
+
+    Парсит строку периода в даты начала и конца, а также возвращает наименование периода
+    Поддерживаемые форматы периода:
+    - Год: ГГГГ
+    - Квартал: QNГГГГ
+    - Месяц: ММ.ГГГГ
+    - Сутки: ДД.ММ.ГГГГ
+    - Произвольный период: ДД.ММ.ГГГГ-ДД.ММ.ГГГГ
+
+    Args:
+        period (str): Временной период
+
+    Returns:
+        tuple[date, date, str]: Даты начала и конца, а также наименование периода
+
+    Raises:
+        ValueError: При некорректных данных
+        Exception: В непредвиденной ситуации
+
+    Example:
+        >>>date_start, date_end, period_name = period_parse("2025")
+    """
 
     try:
         #произвольный период ДД.ММ.ГГГГ-ДД.ММ.ГГГГ

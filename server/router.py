@@ -131,7 +131,8 @@ async def delete_day(date: date, session: AsyncSession = Depends(get_db_connecti
 async def get_days_by_year(
     year: int,
     week_type: int = Query(5, ge=5, le=6, description="Тип рабочей недели"),
-    statistic: bool = Query(False, description="Подробная статистика по выбранному периоду")
+    statistic: bool = Query(False, description="Подробная статистика по выбранному периоду"),
+    session: AsyncSession = Depends(get_db_connection)
 ) -> dict:
     """Получает календарные дни за год
 
@@ -149,7 +150,14 @@ async def get_days_by_year(
     """
 
     logger.info(f"Пробуем получить календарные дни по параметрам: год={year}, рабочая неделя={week_type}")
-    external_service = ExternalService()
+    external_service = ExternalService(session)
     result = await external_service.get_days_by_year(year, week_type, statistic)
     logger.info(f"Календарные дни (год={year}, рабочая неделя={week_type}) успешно получены")
     return result
+
+@router.post("/external/insert_production_calendar", dependencies=[Depends(verify_auth)], response_model=dict)
+async def insert_production_calendar(json_calendar: dict, session: AsyncSession = Depends(get_db_connection)) -> dict:
+    logger.info(f"Пробуем вставить производственный календарь в БД")
+    external_service = ExternalService(session)
+    result = await external_service.insert_production_calendar(json_calendar)
+    return {"message": f"Вставка прошла успешно, было добавлено/обновлено {result} календарных дней"}
