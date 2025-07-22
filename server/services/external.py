@@ -116,6 +116,25 @@ class ExternalService:
                 raise e
 
     async def insert_production_calendar(self, json_calendar: dict) -> int:
+        """Сохранение производственного календаря в БД
+
+        Сохраняет за раз весь производственный календарь, т.е. все дни из него
+        При наличии дня в БД перезаписывает его поля
+
+        Args:
+            self (Self@ExternalService): Экземпляр класса
+            json_calendar (dict): Производственный календарь
+
+        Returns:
+            int: Кол-во вставленных/изменённых дней в БД
+
+        Raises:
+            Exception: В непредвиденной ситуации
+
+        Example:
+            >>>count_saved_days = await external_service.insert_production_calendar({..., days: [...]})
+        """
+
         try:
             logger.info(f"Пробуем вставить производственный календарь в БД")
             days_list: list[dict] = json_calendar.get("days")
