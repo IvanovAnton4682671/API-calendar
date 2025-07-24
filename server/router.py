@@ -1,7 +1,7 @@
 from core.logger import setup_logger
 from security import verify_auth
-from fastapi import APIRouter, Query, Depends, HTTPException, status
-from schemas import CalendarDayInDB, CalendarDayInput
+from fastapi import APIRouter, Query, Depends
+from schemas import CalendarDayInDB, CalendarDayInput, ProductionCalendar
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db_connection
 from typing import Optional, Union
@@ -163,14 +163,14 @@ async def parse_external_calendar(
         raise e
 
 @router.post("/external/insert_production_calendar", dependencies=[Depends(verify_auth)], response_model=dict)
-async def insert_production_calendar(json_calendar: dict, session: AsyncSession = Depends(get_db_connection)) -> dict:
+async def insert_production_calendar(production_calendar: ProductionCalendar, session: AsyncSession = Depends(get_db_connection)) -> dict:
     """Вставляет в БД производственный календарь
 
     Вставляет в БД за раз большое количество календарных дней. При наличии дня заменяет его поля на новые
     Предполагается использование только в роутинге
 
     Args:
-        json_calendar (dict): Производственный календарь в json-формате
+        production_calendar (ProductionCalendar): Производственный календарь
         session (AsyncSession): Асинхронная сессия для выполнения запросов к БД
 
     Returns:
@@ -180,7 +180,7 @@ async def insert_production_calendar(json_calendar: dict, session: AsyncSession 
     try:
         logger.info(f"Пробуем вставить производственный календарь в БД")
         external_service = ExternalService(session)
-        result = await external_service.insert_production_calendar(json_calendar)
+        result = await external_service.insert_production_calendar(production_calendar)
         return {"message": f"Вставка прошла успешно, было добавлено/обновлено {result} календарных дней"}
     except Exception as e:
         raise e

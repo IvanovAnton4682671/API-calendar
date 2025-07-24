@@ -7,7 +7,7 @@ from repo import CalendarDayRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from model import CalendarDay
 from services.calendar_day_utils import assemble_day, parse_date
-from schemas import CalendarDayInput
+from schemas import CalendarDayInput, ProductionCalendar, ReadyCalendarDay
 from fastapi import HTTPException, status
 
 logger = setup_logger("service.external")
@@ -115,7 +115,7 @@ class ExternalService:
             except Exception as e:
                 raise e
 
-    async def insert_production_calendar(self, json_calendar: dict) -> int:
+    async def insert_production_calendar(self, production_calendar: ProductionCalendar) -> int:
         """Сохранение производственного календаря в БД
 
         Сохраняет за раз весь производственный календарь, т.е. все дни из него
@@ -123,7 +123,7 @@ class ExternalService:
 
         Args:
             self (Self@ExternalService): Экземпляр класса
-            json_calendar (dict): Производственный календарь
+            production_calendar (ProductionCalendar): Производственный календарь
 
         Returns:
             int: Кол-во вставленных/изменённых дней в БД
@@ -137,7 +137,7 @@ class ExternalService:
 
         try:
             logger.info(f"Пробуем вставить производственный календарь в БД")
-            days_list: list[dict] = json_calendar.get("days")
+            days_list: list[ReadyCalendarDay] = production_calendar.days
             if not days_list:
                 desc = "Некорректный формат производственного календаря! Требуется {..., days: [...]}"
                 logger.warning(desc)
@@ -147,11 +147,9 @@ class ExternalService:
                 )
             list_correct_days: list[CalendarDay] = []
             for day in days_list:
-                day_date = parse_date(day.get("date"))
-                day_type_id = int(day.get("type_id"))
-                day_note = day.get("note", None)
-                day_data = CalendarDayInput(date=day_date, type_id=day_type_id)
-                correct_day = assemble_day(day_data, day_note)
+                day_date = parse_date(day.date)
+                day_data = CalendarDayInput(date=day_date, type_id=day.type_id)
+                correct_day = assemble_day(day_data, day.note)
                 list_correct_days.append(correct_day)
             inserted_days = await self._repo.insert_production_calendar(list_correct_days)
             return inserted_days
