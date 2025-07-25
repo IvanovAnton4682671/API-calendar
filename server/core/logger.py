@@ -1,4 +1,5 @@
 import logging
+from fastapi import HTTPException, status
 
 LOG_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -13,7 +14,7 @@ def setup_logger(name: str) -> logging.Logger:
         name (str): Имя логгера
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
     Examples:
         >>>logger = setup_logger("filename")
@@ -31,4 +32,8 @@ def setup_logger(name: str) -> logging.Logger:
         logger.addHandler(console_handler)
         return logger
     except Exception as e:
-        raise Exception(f"При создании логгера name={name} произошла ошибка: {str(e)}")
+        desc = f"При создании логгера name={name} произошла ошибка: {str(e)}"
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )

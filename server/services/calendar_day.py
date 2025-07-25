@@ -5,7 +5,6 @@ from schemas import CalendarDayInput, CalendarDayInDB
 from typing import Optional
 from services.calendar_day_utils import assemble_day, period_parse, create_base_days, merge_days, formatting_days, get_statistic
 from datetime import date
-from fastapi import HTTPException, status
 
 logger = setup_logger("services.calendar_day")
 

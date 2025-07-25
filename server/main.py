@@ -1,7 +1,6 @@
 from core.logger import setup_logger
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, status
 from database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 import router
@@ -21,7 +20,7 @@ async def lifespan(app: FastAPI):
         app (FastAPI): Экземпляр сервера
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
     """
 
     try:
@@ -32,7 +31,10 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         desc = f"При создании таблицы произошла ошибка: {str(e)}"
         logger.error(desc, exc_info=True)
-        raise Exception(desc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=desc
+        )
     yield
     logger.info("Остановка сервера")
     await engine.dispose()

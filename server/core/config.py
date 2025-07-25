@@ -8,8 +8,7 @@ logger = setup_logger("core.config")
 class Settings(BaseSettings):
     """Для работы с переменными окружения
 
-    Класс предназначен для удобной работы со всеми переменными окружение
-    без нужды подгружать их через dotenv
+    Класс предназначен для удобной работы со всеми переменными окружение без нужды подгружать их через dotenv
 
     Attributes:
         POSTGRESQL_HOST (str): Хост подключения к PostgreSQL
@@ -102,14 +101,14 @@ class Settings(BaseSettings):
         Адрес подключения к PostgreSQL, собирается при старте сервера
 
         Args:
-            self (Self@Settings): Экземпляр класса Settings
+            self (Self@Settings): Экземпляр класса
 
         Returns:
             SecretStr: Полная строка подключения к БД формата 
-                'postgresql+asyncpg://username:password@host:port/db_name'
+                postgresql+asyncpg://username:password@host:port/db_name
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
         """
 
         try:
@@ -130,7 +129,7 @@ class Settings(BaseSettings):
     class Config:
         """Класс дополнительных настроек
 
-        Класс с дополнительными настройками для класса Settings
+        Класс дополнительных настроек
 
         Attributes:
             env_file (str): Название файла с переменными окружения

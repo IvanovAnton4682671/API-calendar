@@ -20,8 +20,7 @@ def validate_type_text(type_text: str) -> str:
         str: Описание типа дня, если оно прошло валидацию
 
     Raises:
-        ValueError: При некорректном значении type_text
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
     Examples:
         >>>class Test(BaseModel):
@@ -59,8 +58,7 @@ def validate_week_day(week_day: str) -> str:
         str: Сокращённое наименование дня, если оно прошло валидацию
 
     Raises:
-        ValueError: При некорректном значении week_day
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
     Examples:
         >>>class Test(BaseModel):
@@ -98,9 +96,9 @@ def validate_date(date: str) -> str:
         str: Дата в том же формате, если она прошла валидацию
 
     Raises:
-        HTTPException: в разных случаях
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>class Test(BaseModel):
         >>>date: str = Filed(...)
         >>>_validate_date = field_validator("date")(validate_date)
@@ -149,9 +147,9 @@ def validate_work_week_type(work_week_type: str) -> str:
         str: Тот же тип рабочей недели, если он прошёл валидацию
 
     Raises:
-        HTTPException: в разных случаях
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>class Test(BaseModel):
         >>>work_week_type: str = Filed(...)
         >>>_validate_validate_work_week_type = field_validator("validate_work_week_type")(validate_work_week_type)
@@ -187,9 +185,9 @@ def validate_period(period: str) -> str:
         str: Тот же период календаря, если он прошёл валидацию
 
     Raises:
-        HTTPException: в разных случаях
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>class Test(BaseModel):
         >>>period: str = Filed(...)
         >>>_validate_period = field_validator("period")(validate_period)
@@ -258,7 +256,7 @@ class BaseCalendarDay(BaseModel):
     class Config:
         """Класс дополнительных настроек
 
-        Класс с дополнительными настройками для класса BaseCalendarDay
+        Класс дополнительных настроек
 
         Attributes:
             from_attributes (bool): Для синхронизации с полями ORM-модели
@@ -293,7 +291,7 @@ class CalendarDayInput(BaseModel):
     class Config:
         """Класс дополнительных настроек
 
-        Класс с дополнительными настройками для класса CalendarDayInput
+        Класс дополнительных настроек
 
         Attributes:
             from_attributes (bool): Для синхронизации с полями ORM-модели
@@ -315,6 +313,9 @@ class CalendarDayInDB(BaseModel):
         week_day (str): Сокращённое наименование дня
         _validate_type_text (@field_validator): Валидатор поля type_text
         _validate_week_day (@field_validator): Валидатор поля week_day
+
+    Examples:
+        >>>calendar_day_in_db = CalendarDayInDB(cdidb).model_validate()
     """
 
     id: int = Field(
@@ -355,7 +356,7 @@ class CalendarDayInDB(BaseModel):
     class Config:
         """Класс дополнительных настроек
 
-        Класс с дополнительными настройками для класса CalendarDayInDB
+        Класс дополнительных настроек
 
         Attributes:
             from_attributes (bool): Для синхронизации с полями ORM-модели
@@ -376,6 +377,9 @@ class ReadyCalendarDay(BaseModel):
         week_day (str): Сокращённое наименование дня
         _validate_type_text (@field_validator): Валидатор поля type_text
         _validate_week_day (@field_validator): Валидатор поля week_day
+
+    Examples:
+        >>>ready_calendar_day = ReadyCalendarDay(date=...,...)
     """
 
     date: str = Field(
@@ -414,7 +418,7 @@ class ReadyCalendarDay(BaseModel):
     class Config:
         """Класс дополнительных настроек
 
-        Класс с дополнительными настройками для класса ReadyCalendarDay
+        Класс дополнительных настроек
 
         Attributes:
             from_attributes (bool): Для синхронизации с полями ORM-модели
@@ -442,6 +446,9 @@ class ProductionCalendar(BaseModel):
         _validate_date_end (@field_validator): Валидатор поля date_end
         _validate_work_week_type (@field_validator): Валидатор поля work_week_type
         _validate_period (@field_validator): Валидатор поля period
+
+    Examples:
+        >>>production_calendar = ProductionCalendar(date_start=...,...)
     """
 
     date_start: str = Field(
@@ -506,7 +513,7 @@ class ProductionCalendar(BaseModel):
     class Config:
         """Класс дополнительных настроек
 
-        Класс с дополнительными настройками для класса ProductionCalendar
+        Класс дополнительных настроек
 
         Attributes:
             from_attributes (bool): Для синхронизации с полями ORM-модели

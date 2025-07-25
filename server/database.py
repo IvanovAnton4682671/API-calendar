@@ -3,7 +3,6 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from core.config import settings
 from typing import AsyncGenerator
-from fastapi import HTTPException, status
 
 logger = setup_logger("database")
 

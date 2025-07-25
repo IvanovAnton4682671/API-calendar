@@ -69,9 +69,6 @@ class CalendarDay(Base):
         Returns:
             str: Строка со всеми полями экземпляра
 
-        Raises:
-            Examples: В непредвиденной ситуации
-
         Examples:
             >>>calendar_day = CalendarDay(date=...,type_id=...,...)
             >>>print(calendar_day)

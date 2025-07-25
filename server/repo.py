@@ -48,7 +48,7 @@ class CalendarDayRepository:
             CalendarDayInDB: Представление созданного календарного дня в БД
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
         Examples:
             >>>created_day = await repo.create_day(CalendarDay(date=...,...))
@@ -86,7 +86,7 @@ class CalendarDayRepository:
         Raises:
             Exception: В непредвиденной ситуации
 
-        Example:
+        Examples:
             >>>inserted_days = await repo.insert_production_calendar([CalendarDay(...),...])
         """
 
@@ -128,7 +128,7 @@ class CalendarDayRepository:
             list[CalendarDayInDB]: Список календарных дней, если такие дни нашлись, иначе пустой список
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
         Examples:
             >>>db_days = await repo.get_days_by_period(date(2025, 1, 1), date(2025, 12, 1))
@@ -165,7 +165,7 @@ class CalendarDayRepository:
             Optional[CalendarDay]: Календарный день, если такой день нашёлся, иначе None
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
         Examples:
             >>>day = await repo.get_day_by_date(date(2025, 1, 1))
@@ -203,7 +203,7 @@ class CalendarDayRepository:
             Optional[CalendarDayInDB]: Обновлённый календарный день, если такой день существовал, иначе None
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
         Examples:
             >>>updated_day = await repo.update_day(date(2025, 1, 1), CalendarDay(date=...,...))

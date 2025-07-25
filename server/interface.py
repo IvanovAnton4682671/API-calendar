@@ -10,7 +10,7 @@ class ExternalInterface:
 
     Класс представляет собой интерфейс взаимодействия с внешними ресурсами, которые предоставляют данные производственных календарей
 
-    Example:
+    Examples:
         >>>external_interface = ExternalInterface()
     """
 
@@ -39,9 +39,9 @@ class ExternalInterface:
             str: HTML-страница в формате строки
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
-        Example:
+        Examples:
             >>>response_text = await external_interface.get_consultant_calendar("2025")
         """
 
@@ -75,9 +75,9 @@ class ExternalInterface:
             str: HTML-страница в формате строки
 
         Raises:
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
-        Example:
+        Examples:
             >>>response_text = await external_interface.get_hhru_calendar("2025")
         """
 

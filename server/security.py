@@ -10,7 +10,10 @@ def verify_auth(authentication: str = Header(...)) -> None:
     Args:
         authorization (str): Заголовок с токеном
 
-    Example:
+    Raises:
+        HTTPException: В непредвиденной ситуации
+
+    Examples:
         >>>@app.post("/db/post", dependencies=[Depends(verify_auth)])
     """
 

@@ -21,7 +21,7 @@ def assemble_day(day_data: CalendarDayInput, note: Optional[str]) -> CalendarDay
         CalendarDay: Собранная модель календарного дня
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
     Examples:
         >>>correct_day = assemble_day(CalendarDayInput(date=...,...), "Описание")
@@ -57,10 +57,9 @@ def parse_date(date_str: str) -> date:
             date: Дата формата date
 
         Raises:
-            ValueError: При некорректных данных
-            Exception: В непредвиденной ситуации
+            HTTPException: В непредвиденной ситуации
 
-        Example:
+        Examples:
             >>>correct_date = parse_date("01.01.2025")
         """
 
@@ -99,10 +98,9 @@ def period_parse(period: str) -> tuple[date, date, str]:
         tuple[date, date, str]: Даты начала и конца, а также наименование периода
 
     Raises:
-        ValueError: При некорректных данных
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>date_start, date_end, period_name = period_parse("2025")
     """
 
@@ -231,9 +229,9 @@ def create_base_days(date_start: date, date_end: date, week_type: int) -> list[B
         list[BaseCalendarDay]: Список обычных календарных дней
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>base_days = create_base_days(date(2025, 1, 1), date(2025, 12, 1), 5)
     """
 
@@ -282,9 +280,9 @@ def merge_days(base_days: list[BaseCalendarDay], db_days: list[CalendarDayInDB])
         list[Union[BaseCalendarDay, CalendarDayInDB]]: Список, содержащий дни обоих типов
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>merged_days = merge_days([BaseCalendarDay(date=...,...),...], [CalendarDayInDB(date=...,...),...])
     """
 
@@ -320,9 +318,9 @@ def formatting_days(merged_days: list[Union[BaseCalendarDay, CalendarDayInDB]], 
         list[Union[BaseCalendarDay, CalendarDayInDB]]: Список форматированных дней обоих форматов
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>formatted_days = formatting_days([BaseCalendarDay(date=...,...),...,CalendarDayInDB(date=...,...),...], False, 5)
     """
 
@@ -375,9 +373,9 @@ def get_statistic(merged_days: list[Union[BaseCalendarDay, CalendarDayInDB]]) ->
         dict: Словарь статистики
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>statistic = get_statistic([BaseCalendarDay(date=...,...),...,CalendarDayInDB(date=...,...),...])
     """
 

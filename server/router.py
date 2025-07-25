@@ -31,6 +31,9 @@ async def create_day(
 
     Returns:
         CalendarDayInDB: Представление созданного дня в БД
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:
@@ -65,6 +68,9 @@ async def get_days_by_period(
 
     Returns:
         dict: Словарь со всей информацией
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:
@@ -96,6 +102,9 @@ async def update_day(
 
     Returns:
         Union[CalendarDayInDB, dict]: Возвращает либо обновлённый день, либо пустой словарь (если день не существует)
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:
@@ -120,6 +129,9 @@ async def delete_day(date: date, session: AsyncSession = Depends(get_db_connecti
 
     Returns:
         dict: Словарь со статусом удаления дня
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:
@@ -151,6 +163,9 @@ async def parse_external_calendar(
 
     Returns:
         dict: Словарь со всей информацией
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:
@@ -175,6 +190,9 @@ async def insert_production_calendar(production_calendar: ProductionCalendar, se
 
     Returns:
         dict: Возвращает количество вставленных/изменённых дней
+
+    Raises:
+        Exception: В непредвиденной ситуации
     """
 
     try:

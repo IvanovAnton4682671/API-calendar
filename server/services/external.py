@@ -50,10 +50,9 @@ class ExternalService:
             dict: Словарь с календарём и дополнительными данными
 
         Raises:
-            ValueError: В случае невалидных данных
             Exception: В непредвиденной ситуации
 
-        Example:
+        Examples:
             >>>result = await external_service.get_days_by_year(2025, 5, True)
         """
 
@@ -131,7 +130,7 @@ class ExternalService:
         Raises:
             Exception: В непредвиденной ситуации
 
-        Example:
+        Examples:
             >>>count_saved_days = await external_service.insert_production_calendar({..., days: [...]})
         """
 

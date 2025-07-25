@@ -21,9 +21,9 @@ def parse_consultant_calendar(response_text: str, year: int, week_type: int) -> 
         list[dict]: Сформированный список календарных дней
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>correct_external_days = parse_consultant_calendar("...", 2025, 5)
     """
 
@@ -101,9 +101,9 @@ def parse_hhru_calendar(response_text: str, year: int, week_type: int) -> list[d
         list[dict]: Сформированный список календарных дней
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>correct_external_days = parse_hhru_calendar("...", 2025, 5)
     """
 
@@ -193,9 +193,9 @@ def get_statistic(correct_external_days: list[dict]) -> dict:
         dict: Сформированная статистика
 
     Raises:
-        Exception: В непредвиденной ситуации
+        HTTPException: В непредвиденной ситуации
 
-    Example:
+    Examples:
         >>>add_statistic = get_statistic([{...},...])
     """
 
