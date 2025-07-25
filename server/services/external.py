@@ -7,7 +7,7 @@ from repo import CalendarDayRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from model import CalendarDay
 from services.calendar_day_utils import assemble_day, parse_date
-from schemas import CalendarDayInput, ProductionCalendar, ReadyCalendarDay
+from schemas.schemas import CalendarDayInput, ProductionCalendar, ReadyCalendarDay
 from fastapi import HTTPException, status
 
 logger = setup_logger("service.external")

@@ -1,8 +1,5 @@
-from core.logger import setup_logger
 from database import Base
 from sqlalchemy import Column, Integer, Date, String
-
-logger = setup_logger("model")
 
 class CalendarDay(Base):
     """Описывает таблицу календарных дней

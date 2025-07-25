@@ -1,7 +1,7 @@
 from core.logger import setup_logger
 from security import verify_auth
 from fastapi import APIRouter, Query, Depends
-from schemas import CalendarDayInDB, CalendarDayInput, ProductionCalendar
+from schemas.schemas import CalendarDayInDB, CalendarDayInput, ProductionCalendar
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db_connection
 from typing import Optional, Union

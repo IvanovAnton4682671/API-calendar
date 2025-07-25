@@ -1,7 +1,7 @@
 from core.logger import setup_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from repo import CalendarDayRepository
-from schemas import CalendarDayInput, CalendarDayInDB
+from schemas.schemas import CalendarDayInput, CalendarDayInDB
 from typing import Optional
 from services.calendar_day_utils import assemble_day, period_parse, create_base_days, merge_days, formatting_days, get_statistic
 from datetime import date

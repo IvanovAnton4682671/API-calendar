@@ -2,7 +2,7 @@ from core.logger import setup_logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from model import CalendarDay
 from typing import Optional
-from schemas import CalendarDayInDB
+from schemas.schemas import CalendarDayInDB
 from datetime import date
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
