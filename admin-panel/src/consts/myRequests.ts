@@ -1,0 +1,314 @@
+import { FormSchema, UsingJSON } from "../types/formSchemas";
+
+export const GetDaysByPeriodSchema: FormSchema = {
+    title: "Получить дни за период",
+    description: "Позволяет получить календарные дни за определённый период с дополнительными параметрами",
+    fields: {
+        period: {
+            type: "text",
+            label: "Период",
+            placeholder: "Введите временной период",
+            hint: "Поддерживаемые форматы периода:\nГод: ГГГГ (Пример: 2025)\nКвартал: QNГГГГ (Пример: Q12025)\nМесяц: ММ.ГГГГ (Пример: 01.2025)\nСутки: ДД.ММ.ГГГГ (Пример: 01.01.2025)\nПроизвольный период: ДД.ММ.ГГГГ-ДД.ММ.ГГГГ (Пример: 01.01.2025-10.01.2025)",
+            required: true
+        },
+        compact: {
+            type: "switch",
+            label: "Компактный формат вывода",
+            default: false,
+            required: false
+        },
+        weekType: {
+            type: "radio",
+            label: "Тип рабочей недели",
+            options: {
+                "5": "5-дневная",
+                "6": "6-дневная"
+            },
+            required: true
+        },
+        statistic: {
+            type: "switch",
+            label: "Дополнительная статистика",
+            default: false,
+            required: false
+        },
+    }
+}
+
+export const GetExternalCalendarSchema: FormSchema = {
+    title: "Получить календарь за год",
+    description: "Позволяет получить производственный календарь за определённый год с дополнительными параметрами",
+    fields: {
+        year: {
+            type: "number",
+            label: "Год",
+            placeholder: "Введите год",
+            hint: "Поддерживаемый формат года:\nГГГГ (Пример: 2025)",
+            required: true
+        },
+        weekType: {
+            type: "radio",
+            label: "Тип рабочей недели",
+            options: {
+                "5": "5-дневная",
+                "6": "6-дневная"
+            },
+            required: true
+        },
+        statistic: {
+            type: "switch",
+            label: "Дополнительная статистика",
+            default: false,
+            required: false
+        }
+    }
+}
+
+export const PostCreateDaySchema: FormSchema = {
+    title: "Создать день",
+    description: "Позволяет создать календарный день (доступ по токену)",
+    fields: {
+        authentication: {
+            type: "text",
+            label: "Токен аутентификации",
+            placeholder: "Введите секретный токен доступа",
+            hint: "Поддерживаемый формат токена аутентификации (без <>):\nBearer <токен> (Пример: Bearer token)",
+            required: true
+        },
+        date: {
+            type: "text",
+            label: "Дата дня",
+            placeholder: "Введите дату дня",
+            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
+            required: true
+        },
+        typeId: {
+            type: "radio",
+            label: "Тип дня",
+            options: {
+                "1": "1",
+                "2": "2",
+                "3": "3"
+            },
+            required: true
+        },
+        note: {
+            type: "text",
+            label: "Описание дня",
+            placeholder: "Введите дополнительное описание дня",
+            hint: "Опциональное описание дня",
+            required: false
+        }
+    }
+}
+
+export const PostInsertExternalCalendarSchema: FormSchema = {
+    title: "Импортировать календарь",
+    description: "Позволяет импортировать производственный календарь произвольного размера (доступ по токену)",
+    fields: {
+        authentication: {
+            type: "text",
+            label: "Токен аутентификации",
+            placeholder: "Введите секретный токен доступа",
+            hint: "Поддерживаемый формат токена аутентификации (без <>):\nBearer <токен> (Пример: Bearer token)",
+            required: true
+        },
+        dateStart: {
+            type: "text",
+            label: "Дата начала периода",
+            placeholder: "Введите дату начала периода",
+            hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
+            required: true
+        },
+        dateEnd: {
+            type: "text",
+            label: "Дата конца периода",
+            placeholder: "Введите дату конца периода",
+            hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
+            required: true
+        },
+        workWeekType: {
+            type: "radio",
+            label: "Тип рабочей недели",
+            options: {
+                "5": "5-дневная",
+                "6": "6-дневная"
+            },
+            required: true
+        },
+        period: {
+            type: "text",
+            label: "Временной период",
+            placeholder: "Введите название временного периода",
+            hint: "Поддерживаемые форматы периода:\nГод\nКвартал\nМесяц\nСутки\nПроизвольный период",
+            required: true
+        },
+        calendarDays: {
+            type: "number",
+            label: "Кол-во дней",
+            placeholder: "Введите кол-во календарных дней",
+            hint: "Опциональное количество календарных дней",
+            required: false
+        },
+        calendarDaysWithoutHolidays: {
+            type: "number",
+            label: "Кол-во дней без праздников",
+            placeholder: "Введите кол-во календарных дней без праздничных дней",
+            hint: "Опциональное количество календарных дней без государственных праздников",
+            required: false
+        },
+        workDays: {
+            type: "number",
+            label: "Кол-во рабочих дней",
+            placeholder: "Введите кол-во рабочих календарных дней",
+            hint: "Опциональное количество рабочих дней",
+            required: false
+        },
+        weekends: {
+            type: "number",
+            label: "Кол-во выходных дней",
+            placeholder: "Введите кол-во выходных календарных дней",
+            hint: "Опциональное количество выходных дней",
+            required: false
+        },
+        holidays: {
+            type: "number",
+            label: "Кол-во праздничных дней",
+            placeholder: "Введите кол-во праздничных календарных дней",
+            hint: "Опциональное количество государственных праздников",
+            required: false
+        },
+        days: [
+            {
+                date: {
+                    type: "text",
+                    label: "Дата дня",
+                    placeholder: "Введите дату дня",
+                    hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
+                    required: true
+                },
+                typeId: {
+                    type: "radio",
+                    label: "Тип дня",
+                    options: {
+                        "1": "1",
+                        "2": "2",
+                        "3": "3"
+                    },
+                    required: true
+                },
+                typeText: {
+                    type: "radio",
+                    label: "Название типа дня",
+                    options: {
+                        "Рабочий день": "Рабочий день",
+                        "Выходной день": "Выходной день",
+                        "Государственный праздник": "Государственный праздник"
+                    },
+                    required: true
+                },
+                note: {
+                    type: "text",
+                    label: "Описание дня",
+                    placeholder: "Введите дополнительное описание дня",
+                    hint: "Опциональное описание дня",
+                    required: false
+                },
+                weekDay: {
+                    type: "radio",
+                    label: "День недели",
+                    options: {
+                        "пн": "пн",
+                        "вт": "вт",
+                        "ср": "ср",
+                        "чт": "чт",
+                        "пт": "пт",
+                        "сб": "сб",
+                        "вс": "вс"
+                    },
+                    required: true
+                }
+            },
+        ]
+    }
+}
+
+export const PutUpdateDaySchema: FormSchema = {
+    title: "Изменить день",
+    description: "Позволяет изменить календарный день по дате (доступ по токену)",
+    fields: {
+        authentication: {
+            type: "text",
+            label: "Токен аутентификации",
+            placeholder: "Введите секретный токен доступа",
+            hint: "Поддерживаемый формат токена аутентификации (без <>):\nBearer <токен> (Пример: Bearer token)",
+            required: true
+        },
+        oldDate: {
+            type: "text",
+            label: "Дата изменяемого дня",
+            placeholder: "Введите дату изменяемого дня",
+            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
+            required: true
+        },
+        newDate: {
+            type: "text",
+            label: "Новая дата дня",
+            placeholder: "Введите новую дату дня",
+            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
+            required: true
+        },
+        typeId: {
+            type: "radio",
+            label: "Тип дня",
+            options: {
+                "1": "1",
+                "2": "2",
+                "3": "3"
+            },
+            required: true
+        },
+        note: {
+            type: "text",
+            label: "Описание дня",
+            placeholder: "Введите дополнительное описание дня",
+            hint: "Опциональное описание дня",
+            required: false
+        }
+    }
+}
+
+export const DeleteDaySchema: FormSchema = {
+    title: "Удалить день",
+    description: "Позволяет удалить календарный день по дате (доступ по токену)",
+    fields: {
+        authentication: {
+            type: "text",
+            label: "Токен аутентификации",
+            placeholder: "Введите секретный токен доступа",
+            hint: "Поддерживаемый формат токена аутентификации (без <>):\nBearer <токен> (Пример: Bearer token)",
+            required: true
+        },
+        date: {
+            type: "text",
+            label: "Дата дня",
+            placeholder: "Введите дату дня",
+            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
+            required: true
+        },
+    }
+}
+
+export const UsingJSONSchema: UsingJSON = {
+    title: "Использовать JSON",
+    description: "Позволяет ввести данные производственного календаря в JSON-формате",
+    fields: {
+        jsonArea: {
+            type: "textArea",
+            label: "Календарь в JSON-формате",
+            placeholder: "Введите данные календаря в JSON-формате",
+            hint: 'Пример JSON-календаря:\n{\n"date_start": "01.01.2025",\n"date_end": "10.01.2025",\n"work_week_type": "5-дневная рабочая неделя",\n"period": "Произвольный период",\n"calendar_days": 10,\n"calendar_days_without_holidays": 2,\n"work_days": 2,\n"weekends": 0,\n"holidays": 8,\n"days": [\n{\n"date": "01.01.2025",\n"type_id": 3,\n"type_text": "Государственный праздник",\n"note": "Новогодние каникулы",\n"week_day": "ср"\n},\n...\n]\n}',
+            required: true
+        }
+    }
+}
