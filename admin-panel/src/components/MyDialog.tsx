@@ -1,6 +1,6 @@
 import { FormSchema, SubmitFunction } from "../types/formSchemas"
 import { Dialog, Flex } from "@radix-ui/themes"
-import MyForm from "./MyForm"
+import MyFormConstructor from "./MyFormConstructor"
 import MyServerZone from "./MyServerZone"
 import { useState } from "react"
 
@@ -24,7 +24,7 @@ function MyDialog({triggerButton, formSchema, submitFunc}:
             setServerAnswer(null)
         }
     }
-
+//<MyForm formSchema={formSchema} submitFunc={submitFunc} onSubmitSuccess={handleSubmitSuccess} />
     return(
         <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
             <Dialog.Trigger>{triggerButton}</Dialog.Trigger>
@@ -33,7 +33,7 @@ function MyDialog({triggerButton, formSchema, submitFunc}:
                     <Flex direction="column" width={serverAnswer ? "50%" : "100%"}>
                         <Dialog.Title size="5" mb="3">{formSchema.title}</Dialog.Title>
                         <Dialog.Description size="3" mb="5">{formSchema.description}</Dialog.Description>
-                        <MyForm formSchema={formSchema} submitFunc={submitFunc} onSubmitSuccess={handleSubmitSuccess} />
+                        <MyFormConstructor formSchema={formSchema} submitFunc={submitFunc} onSubmitSuccess={handleSubmitSuccess} />
                     </Flex>
                     {serverAnswer && (
                         <MyServerZone serverAnswer={serverAnswer} />
