@@ -1,4 +1,6 @@
 admin-panel/node_modules
+admin-panel/.env
+
 server/.venv
 server/.env
 server/__pycache__

@@ -3,15 +3,23 @@ import { Dialog, Flex } from "@radix-ui/themes"
 import MyFormConstructor from "./MyFormConstructor"
 import MyServerZone from "./MyServerZone"
 import { useState } from "react"
+import { AxiosError } from "axios"
+import { ServerResponse } from "./MyServerZone"
+
 
 function MyDialog({triggerButton, formSchema, submitFunc}:
     {triggerButton: React.ReactNode, formSchema: FormSchema, submitFunc: SubmitFunction}) {
     //состояние ответа сервера
-    const [serverAnswer, setServerAnswer] = useState<any>(null)
+    const [serverResponse, setServerResponse] = useState<ServerResponse | null>(null)
 
     //обработчик получения ответа сервера
     const handleSubmitSuccess = (response: any) => {
-        setServerAnswer(response)
+        setServerResponse({ data: response })
+    }
+
+    //обработчик получения ошибки от сервера
+    const handleSubmitError = (error: AxiosError | any) => {
+        setServerResponse({ error: error })
     }
 
     //состояние сброса ответа сервера при открытии формы
@@ -21,22 +29,27 @@ function MyDialog({triggerButton, formSchema, submitFunc}:
     const handleOpenChange = (open: boolean) => {
         setIsOpen(open)
         if (open) {
-            setServerAnswer(null)
+            setServerResponse(null)
         }
     }
-//<MyForm formSchema={formSchema} submitFunc={submitFunc} onSubmitSuccess={handleSubmitSuccess} />
+
     return(
         <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
             <Dialog.Trigger>{triggerButton}</Dialog.Trigger>
-            <Dialog.Content maxWidth={serverAnswer ? "1200px" : "600px"}>
+            <Dialog.Content maxWidth={serverResponse ? "1200px" : "600px"}>
                 <Flex direction="row" gap="5">
-                    <Flex direction="column" width={serverAnswer ? "50%" : "100%"}>
+                    <Flex direction="column" width={serverResponse ? "50%" : "100%"}>
                         <Dialog.Title size="5" mb="3">{formSchema.title}</Dialog.Title>
                         <Dialog.Description size="3" mb="5">{formSchema.description}</Dialog.Description>
-                        <MyFormConstructor formSchema={formSchema} submitFunc={submitFunc} onSubmitSuccess={handleSubmitSuccess} />
+                        <MyFormConstructor
+                            formSchema={formSchema}
+                            submitFunc={submitFunc}
+                            onSubmitSuccess={handleSubmitSuccess}
+                            onSubmitError={handleSubmitError}
+                        />
                     </Flex>
-                    {serverAnswer && (
-                        <MyServerZone serverAnswer={serverAnswer} />
+                    {serverResponse && (
+                        <MyServerZone serverResponse={serverResponse} />
                     )}
                 </Flex>
             </Dialog.Content>

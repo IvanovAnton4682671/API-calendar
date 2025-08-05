@@ -25,6 +25,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  client:
+    container_name: calendar-admin-panel
+    build: ./admin-panel
+    ports:
+      - "80:80"
+    depends_on:
+      app:
+        condition: service_started
+
+networks:
+  backend-network:
+    driver: bridge
 
 volumes:
   postgres-data:

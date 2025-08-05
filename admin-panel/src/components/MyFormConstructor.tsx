@@ -8,10 +8,15 @@ import BaseFieldRenderer from "./MyFormFields/BaseFieldRenderer"
 import DayFieldRenderer from "./MyFormFields/DayFieldRenderer"
 import MyDialog from "./MyDialog"
 import { UsingJSONSchema } from "../consts/myRequests"
-import { testSubmit } from "../api/calendar"
+import { testSubmit } from "../api/calendarRequests"
 
-function MyFormConstructor({formSchema, submitFunc, onSubmitSuccess}:
-    {formSchema: FormSchema, submitFunc: (data: any) => Promise<any>, onSubmitSuccess: (data: any) => void}) {
+function MyFormConstructor({formSchema, submitFunc, onSubmitSuccess, onSubmitError}:
+    {
+        formSchema: FormSchema,
+        submitFunc: (data: any) => Promise<any>,
+        onSubmitSuccess: (data: any) => void,
+        onSubmitError: (error: any) => void
+    }) {
     //состояния и методы для работы с обычной формой
     const { formData, jsonData, handleChange, handleJSONAreaChange } = useBaseForm(formSchema)
 
@@ -52,6 +57,7 @@ function MyFormConstructor({formSchema, submitFunc, onSubmitSuccess}:
             onSubmitSuccess(response)
         } catch (error: any) {
             console.error(`Ошибка при отправке данных: ${error}`)
+            onSubmitError(error)
         }
     }
 

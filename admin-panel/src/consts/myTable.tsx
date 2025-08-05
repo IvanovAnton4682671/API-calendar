@@ -6,7 +6,7 @@ import { GetDaysByPeriodSchema,
     PostInsertExternalCalendarSchema,
     PutUpdateDaySchema,
     DeleteDaySchema } from "./myRequests"
-import { testSubmit } from "../api/calendar"
+import { testSubmit, getDaysByPeriod, getExternalCalendar } from "../api/calendarRequests"
 
 export const MyTable: TableRequestsSchema = {
     columns: [
@@ -17,12 +17,12 @@ export const MyTable: TableRequestsSchema = {
                 {
                     button: <Button variant="soft" size="3" color="indigo" style={{cursor: "pointer"}}>Получить дни за период</Button>,
                     data: GetDaysByPeriodSchema,
-                    submitFunc: testSubmit
+                    submitFunc: getDaysByPeriod
                 },
                 {
                     button: <Button variant="soft" size="3" color="indigo" style={{cursor: "pointer"}}>Получить календарь за год</Button>,
                     data: GetExternalCalendarSchema,
-                    submitFunc: testSubmit
+                    submitFunc: getExternalCalendar
                 }
             ]
         },
