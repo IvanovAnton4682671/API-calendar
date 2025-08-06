@@ -6,7 +6,13 @@ import { GetDaysByPeriodSchema,
     PostInsertExternalCalendarSchema,
     PutUpdateDaySchema,
     DeleteDaySchema } from "./myRequests"
-import { testSubmit, getDaysByPeriod, getExternalCalendar } from "../api/calendarRequests"
+import { testSubmit,
+    getDaysByPeriod,
+    getExternalCalendar,
+    postCreateDay,
+    postInsertExternalCalendar,
+    putUpdateDay,
+    deleteDay } from "../api/calendarRequests"
 
 export const MyTable: TableRequestsSchema = {
     columns: [
@@ -33,12 +39,12 @@ export const MyTable: TableRequestsSchema = {
                 {
                     button: <Button variant="soft" size="3" color="mint" style={{cursor: "pointer"}}>Создать день</Button>,
                     data: PostCreateDaySchema,
-                    submitFunc: testSubmit
+                    submitFunc: postCreateDay
                 },
                 {
                     button: <Button variant="soft" size="3" style={{cursor: "pointer"}}>Импортировать календарь</Button>,
                     data: PostInsertExternalCalendarSchema,
-                    submitFunc: testSubmit
+                    submitFunc: postInsertExternalCalendar
                 }
             ]
         },
@@ -49,7 +55,7 @@ export const MyTable: TableRequestsSchema = {
                 {
                     button: <Button variant="soft" size="3" color="orange" style={{cursor: "pointer"}}>Изменить день</Button>,
                     data: PutUpdateDaySchema,
-                    submitFunc: testSubmit
+                    submitFunc: putUpdateDay
                 }
             ]
         },
@@ -60,7 +66,7 @@ export const MyTable: TableRequestsSchema = {
                 {
                     button: <Button variant="soft" size="3" color="red" style={{cursor: "pointer"}}>Удалить день</Button>,
                     data: DeleteDaySchema,
-                    submitFunc: testSubmit
+                    submitFunc: deleteDay
                 }
             ]
         }

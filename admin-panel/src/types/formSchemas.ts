@@ -40,7 +40,7 @@ interface GetDaysByPeriod extends BaseSchema { //получение дней п�
     fields: {
         period: TextField
         compact: SwitchField
-        weekType: RadioField
+        week_type: RadioField
         statistic: SwitchField
     }
 }
@@ -48,7 +48,7 @@ interface GetDaysByPeriod extends BaseSchema { //получение дней п�
 interface GetExternalCalendar extends BaseSchema { //получение календаря за год
     fields: {
         year: NumberField
-        weekType: RadioField
+        week_type: RadioField
         statistic: SwitchField
     }
 }
@@ -57,29 +57,29 @@ interface PostCreateDay extends BaseSchema { //создание дня
     fields: {
         authentication: TextField
         date: TextField
-        typeId: RadioField
+        type_id: RadioField
         note: TextField
     }
 }
 
 export interface DayFields { //поля дня для импорта календаря
     date: TextField
-    typeId: RadioField
-    typeText: RadioField
+    type_id: RadioField
+    type_text: RadioField
     note?: TextField
-    weekDay: RadioField
+    week_day: RadioField
 }
 
 export interface PostInsertExternalCalendar extends BaseSchema { //импорт календаря
     fields: {
         authentication: TextField
-        dateStart: TextField
-        dateEnd: TextField
-        workWeekType: RadioField
+        date_start: TextField
+        date_end: TextField
+        work_week_type: RadioField
         period: TextField
-        calendarDays?: NumberField
-        calendarDaysWithoutHolidays?: NumberField
-        workDays?: NumberField
+        calendar_days?: NumberField
+        calendar_days_without_holidays?: NumberField
+        work_days?: NumberField
         weekends?: NumberField
         holidays?: NumberField
         days: DayFields[]
@@ -89,9 +89,9 @@ export interface PostInsertExternalCalendar extends BaseSchema { //импорт 
 interface PutUpdateDay extends BaseSchema { //изменение дня
     fields: {
         authentication: TextField
-        oldDate: TextField
-        newDate: TextField
-        typeId: RadioField
+        old_date: TextField
+        new_date: TextField
+        type_id: RadioField
         note: TextField
     }
 }

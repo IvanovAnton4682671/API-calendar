@@ -17,7 +17,7 @@ export const GetDaysByPeriodSchema: FormSchema = {
             default: false,
             required: false
         },
-        weekType: {
+        week_type: {
             type: "radio",
             label: "Тип рабочей недели",
             options: {
@@ -46,7 +46,7 @@ export const GetExternalCalendarSchema: FormSchema = {
             hint: "Поддерживаемый формат года:\nГГГГ (Пример: 2025)",
             required: true
         },
-        weekType: {
+        week_type: {
             type: "radio",
             label: "Тип рабочей недели",
             options: {
@@ -82,7 +82,7 @@ export const PostCreateDaySchema: FormSchema = {
             hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
-        typeId: {
+        type_id: {
             type: "radio",
             label: "Тип дня",
             options: {
@@ -113,21 +113,21 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
             hint: "Поддерживаемый формат токена аутентификации (без <>):\nBearer <токен> (Пример: Bearer token)",
             required: true
         },
-        dateStart: {
+        date_start: {
             type: "text",
             label: "Дата начала периода",
             placeholder: "Введите дату начала периода",
             hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
             required: true
         },
-        dateEnd: {
+        date_end: {
             type: "text",
             label: "Дата конца периода",
             placeholder: "Введите дату конца периода",
             hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
             required: true
         },
-        workWeekType: {
+        work_week_type: {
             type: "radio",
             label: "Тип рабочей недели",
             options: {
@@ -143,21 +143,21 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
             hint: "Поддерживаемые форматы периода:\nГод\nКвартал\nМесяц\nСутки\nПроизвольный период",
             required: true
         },
-        calendarDays: {
+        calendar_days: {
             type: "number",
             label: "Кол-во дней",
             placeholder: "Введите кол-во календарных дней",
             hint: "Опциональное количество календарных дней",
             required: false
         },
-        calendarDaysWithoutHolidays: {
+        calendar_days_without_holidays: {
             type: "number",
             label: "Кол-во дней без праздников",
             placeholder: "Введите кол-во календарных дней без праздничных дней",
             hint: "Опциональное количество календарных дней без государственных праздников",
             required: false
         },
-        workDays: {
+        work_days: {
             type: "number",
             label: "Кол-во рабочих дней",
             placeholder: "Введите кол-во рабочих календарных дней",
@@ -187,7 +187,7 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
                     hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
                     required: true
                 },
-                typeId: {
+                type_id: {
                     type: "radio",
                     label: "Тип дня",
                     options: {
@@ -197,7 +197,7 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
                     },
                     required: true
                 },
-                typeText: {
+                type_text: {
                     type: "radio",
                     label: "Название типа дня",
                     options: {
@@ -214,7 +214,7 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
                     hint: "Опциональное описание дня",
                     required: false
                 },
-                weekDay: {
+                week_day: {
                     type: "radio",
                     label: "День недели",
                     options: {
@@ -244,21 +244,21 @@ export const PutUpdateDaySchema: FormSchema = {
             hint: "Поддерживаемый формат токена аутентификации (без <>):\nBearer <токен> (Пример: Bearer token)",
             required: true
         },
-        oldDate: {
+        old_date: {
             type: "text",
             label: "Дата изменяемого дня",
             placeholder: "Введите дату изменяемого дня",
             hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
-        newDate: {
+        new_date: {
             type: "text",
             label: "Новая дата дня",
             placeholder: "Введите новую дату дня",
             hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
-        typeId: {
+        type_id: {
             type: "radio",
             label: "Тип дня",
             options: {
