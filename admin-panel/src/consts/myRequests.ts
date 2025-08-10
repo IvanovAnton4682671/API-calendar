@@ -137,10 +137,15 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
             required: true
         },
         period: {
-            type: "text",
+            type: "select",
             label: "Временной период",
-            placeholder: "Введите название временного периода",
-            hint: "Поддерживаемые форматы периода:\nГод\nКвартал\nМесяц\nСутки\nПроизвольный период",
+            options: {
+                "Год": "Год",
+                "Квартал": "Квартал",
+                "Месяц": "Месяц",
+                "Сутки": "Сутки",
+                "Произвольный период": "Произвольный период",
+            },
             required: true
         },
         calendar_days: {

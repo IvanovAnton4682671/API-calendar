@@ -9,7 +9,7 @@ function useBaseForm(formSchema: FormSchema) {
             if (key !== "days") {
                 if (field.type === "switch") {
                     initialState[key] = field.default || false
-                } else if (field.type === "radio") {
+                } else if (field.type === "radio" || field.type === "select") {
                     initialState[key] = Object.keys(field.options)[0] || ""
                 } else {
                     initialState[key] = ""

@@ -3,6 +3,7 @@ import MyNumberField from "./MyNumberField"
 import MySwitchField from "./MySwitchField"
 import MyRadioField from "./MyRadioField"
 import MyTextAreaField from "./MyTextAreaField"
+import MySelectField from "./MySelectField"
 import React from "react"
 
 function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, handleJSONAreaChange}:
@@ -70,6 +71,17 @@ function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, 
                         field={field}
                         size="3"
                         areaSize="3"
+                        name={fieldName}
+                    />
+                )
+            case "select":
+                return(
+                    <MySelectField
+                        key={fieldName}
+                        dataReceiver={formData[fieldName] || ""}
+                        onValueChange={(value) => handleChange(fieldName, value)}
+                        field={field}
+                        size="3"
                         name={fieldName}
                     />
                 )

@@ -25,6 +25,11 @@ interface RadioField extends FieldBase { //радио-кнопки
     options: Record<string, string>
 }
 
+interface SelectField extends FieldBase { //select-список
+    type: "select"
+    options: Record<string, string>
+}
+
 interface TextAreaField extends FieldBase { //text-area
     type: "textArea"
     placeholder: string
@@ -76,7 +81,8 @@ export interface PostInsertExternalCalendar extends BaseSchema { //импорт 
         date_start: TextField
         date_end: TextField
         work_week_type: RadioField
-        period: TextField
+        //period: TextField
+        period: SelectField
         calendar_days?: NumberField
         calendar_days_without_holidays?: NumberField
         work_days?: NumberField
