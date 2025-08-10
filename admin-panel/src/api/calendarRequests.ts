@@ -66,24 +66,53 @@ export const postCreateDay = async (formSchema: any) => {
 
 export const postInsertExternalCalendar = async (formSchema: any) => {
     try {
-        formSchema.work_week_type = String(`${Number(formSchema.work_week_type)}-дневная рабочая неделя`)
-        formSchema.calendar_days = Number(formSchema.calendar_days)
-        formSchema.calendar_days_without_holidays = Number(formSchema.calendar_days_without_holidays)
-        formSchema.work_days = Number(formSchema.work_days)
-        formSchema.weekends = Number(formSchema.weekends)
-        formSchema.holidays = Number(formSchema.holidays)
-        const response = await axios.post(
-            `/api/external/insert_production_calendar`,
-            formSchema,
-            {
-                headers: {
-                    "Accept": "application/json",
-                    "Authentication": formSchema.authentication,
-                    "Content-Type": "application/json"
+        if (formSchema.jsonArea) {
+            console.log("До форматирования: ", formSchema)
+            const authToken = String(formSchema.jsonArea.authentication)
+            formSchema.date_start = String(formSchema.jsonArea.date_start)
+            formSchema.date_end = String(formSchema.jsonArea.date_end)
+            formSchema.work_week_type = String(`${Number(formSchema.jsonArea.work_week_type)}-дневная рабочая неделя`)
+            formSchema.period = String(formSchema.jsonArea.period)
+            formSchema.calendar_days = Number(formSchema.jsonArea.calendar_days)
+            formSchema.calendar_days_without_holidays = Number(formSchema.jsonArea.calendar_days_without_holidays)
+            formSchema.work_days = Number(formSchema.jsonArea.work_days)
+            formSchema.weekends = Number(formSchema.jsonArea.weekends)
+            formSchema.holidays = Number(formSchema.jsonArea.holidays)
+            formSchema.days = formSchema.jsonArea.days
+            delete formSchema.jsonArea
+            console.log("После форматирования: ", formSchema)
+            const response = await axios.post(
+                `/api/external/insert_production_calendar`,
+                formSchema,
+                {
+                    headers: {
+                        "Accept": "application/json",
+                        "Authentication": authToken,
+                        "Content-Type": "application/json"
+                    }
                 }
-            }
-        )
-        return response.data
+            )
+            return response.data
+        } else {
+            formSchema.work_week_type = String(`${Number(formSchema.work_week_type)}-дневная рабочая неделя`)
+            formSchema.calendar_days = Number(formSchema.calendar_days)
+            formSchema.calendar_days_without_holidays = Number(formSchema.calendar_days_without_holidays)
+            formSchema.work_days = Number(formSchema.work_days)
+            formSchema.weekends = Number(formSchema.weekends)
+            formSchema.holidays = Number(formSchema.holidays)
+            const response = await axios.post(
+                `/api/external/insert_production_calendar`,
+                formSchema,
+                {
+                    headers: {
+                        "Accept": "application/json",
+                        "Authentication": formSchema.authentication,
+                        "Content-Type": "application/json"
+                    }
+                }
+            )
+            return response.data
+        }
     } catch (error: any) {
         console.error("Ошибка при импорте календаря: ", error)
         throw error

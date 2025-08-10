@@ -307,7 +307,7 @@ export const UsingJSONSchema: UsingJSON = {
             type: "textArea",
             label: "Календарь в JSON-формате",
             placeholder: "Введите данные календаря в JSON-формате",
-            hint: 'Пример JSON-календаря:\n{\n"date_start": "01.01.2025",\n"date_end": "10.01.2025",\n"work_week_type": "5-дневная рабочая неделя",\n"period": "Произвольный период",\n"calendar_days": 10,\n"calendar_days_without_holidays": 2,\n"work_days": 2,\n"weekends": 0,\n"holidays": 8,\n"days": [\n{\n"date": "01.01.2025",\n"type_id": 3,\n"type_text": "Государственный праздник",\n"note": "Новогодние каникулы",\n"week_day": "ср"\n},\n...\n]\n}',
+            hint: 'Пример JSON-календаря:\n{\n"authentication": "Bearer токен",\n"date_start": "01.01.2025",\n"date_end": "10.01.2025",\n"work_week_type": 5,\n"period": "Произвольный период",\n"calendar_days": 10,\n"calendar_days_without_holidays": 2,\n"work_days": 2,\n"weekends": 0,\n"holidays": 8,\n"days": [\n{\n"date": "01.01.2025",\n"type_id": 3,\n"type_text": "Государственный праздник",\n"note": "Новогодние каникулы",\n"week_day": "ср"\n},\n...\n]\n}',
             required: true
         }
     }

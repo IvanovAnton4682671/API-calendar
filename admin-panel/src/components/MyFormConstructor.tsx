@@ -8,7 +8,6 @@ import BaseFieldRenderer from "./MyFormFields/BaseFieldRenderer"
 import DayFieldRenderer from "./MyFormFields/DayFieldRenderer"
 import MyDialog from "./MyDialog"
 import { UsingJSONSchema } from "../consts/myRequests"
-import { testSubmit } from "../api/calendarRequests"
 
 function MyFormConstructor({formSchema, submitFunc, onSubmitSuccess, onSubmitError}:
     {
@@ -128,7 +127,7 @@ function MyFormConstructor({formSchema, submitFunc, onSubmitSuccess, onSubmitErr
                                     <Button type="button" variant="soft" size="3" color="orange">Использовать JSON</Button>
                                 }
                                 formSchema={UsingJSONSchema}
-                                submitFunc={testSubmit}
+                                submitFunc={submitFunc}
                             />
                         </Flex>
                     )}
