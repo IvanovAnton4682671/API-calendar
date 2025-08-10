@@ -3,6 +3,7 @@ import MyNumberField from "./MyNumberField"
 import MySwitchField from "./MySwitchField"
 import MyRadioField from "./MyRadioField"
 import MyTextAreaField from "./MyTextAreaField"
+import React from "react"
 
 function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, handleJSONAreaChange}:
     {
@@ -77,4 +78,10 @@ function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, 
         }
 }
 
-export default BaseFieldRenderer
+//export default BaseFieldRenderer
+export default React.memo(BaseFieldRenderer, (prevProps, nextProps) => {
+    return(
+        prevProps.formData[prevProps.fieldName] === nextProps.formData[nextProps.fieldName] &&
+        prevProps.jsonData[prevProps.fieldName] === nextProps.jsonData[nextProps.fieldName]
+    )
+})

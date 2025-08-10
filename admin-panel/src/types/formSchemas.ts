@@ -25,7 +25,7 @@ interface RadioField extends FieldBase { //радио-кнопки
     options: Record<string, string>
 }
 
-interface TextAreaField extends FieldBase {
+interface TextAreaField extends FieldBase { //text-area
     type: "textArea"
     placeholder: string
     hint: string

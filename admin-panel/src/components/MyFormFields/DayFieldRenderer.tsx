@@ -4,6 +4,7 @@ import { Box, Flex, Text, Button, Separator } from "@radix-ui/themes"
 import MyTextField from "./MyTextField"
 import MyNumberField from "./MyNumberField"
 import MyRadioField from "./MyRadioField"
+import React from "react"
 
 function DayFieldRenderer({ formSchema, dayIndex, delDay, dayData, handleDayChange }:
     {
@@ -78,4 +79,22 @@ function DayFieldRenderer({ formSchema, dayIndex, delDay, dayData, handleDayChan
     )
 }
 
-export default DayFieldRenderer
+//функция сравнения объектов
+function shallowEqual(objA: any, objB: any) {
+    if (objA === objB) return true
+    if (typeof objA !== "object" || objA === null) return false
+
+    const keysA = Object.keys(objA)
+    const keysB = Object.keys(objB)
+    if (keysA.length !== keysB.length) return false
+    for (let i = 0; i < keysA.length; i++) {
+        const key = keysA[i]
+        if (objA[key] !== objB[key]) return false
+    }
+    return true
+}
+
+//export default DayFieldRenderer
+export default React.memo(DayFieldRenderer, (prevProps, nextProps) => {
+    return shallowEqual(prevProps.dayData, nextProps.dayData)
+})
