@@ -86,9 +86,9 @@ export const PostCreateDaySchema: FormSchema = {
             type: "radio",
             label: "Тип дня",
             options: {
-                "1": "1",
-                "2": "2",
-                "3": "3"
+                "1": "Рабочий",
+                "2": "Выходной",
+                "3": "Государственный праздник"
             },
             required: true
         },
@@ -161,19 +161,9 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
                     type: "radio",
                     label: "Тип дня",
                     options: {
-                        "1": "1",
-                        "2": "2",
-                        "3": "3"
-                    },
-                    required: true
-                },
-                type_text: {
-                    type: "radio",
-                    label: "Название типа дня",
-                    options: {
-                        "Рабочий день": "Рабочий день",
-                        "Выходной день": "Выходной день",
-                        "Государственный праздник": "Государственный праздник"
+                        "1": "Рабочий",
+                        "2": "Выходной",
+                        "3": "Государственный праздник"
                     },
                     required: true
                 },
@@ -232,9 +222,9 @@ export const PutUpdateDaySchema: FormSchema = {
             type: "radio",
             label: "Тип дня",
             options: {
-                "1": "1",
-                "2": "2",
-                "3": "3"
+                "1": "Рабочий",
+                "2": "Выходной",
+                "3": "Государственный праздник"
             },
             required: true
         },

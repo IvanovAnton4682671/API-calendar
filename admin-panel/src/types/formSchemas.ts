@@ -70,7 +70,6 @@ interface PostCreateDay extends BaseSchema { //создание дня
 export interface DayFields { //поля дня для импорта календаря
     date: TextField
     type_id: RadioField
-    type_text: RadioField
     note?: TextField
     week_day: RadioField
 }

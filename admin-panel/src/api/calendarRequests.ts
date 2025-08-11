@@ -1,4 +1,5 @@
 import axios from "axios"
+import { DayFields } from "../types/formSchemas"
 
 export const testSubmit = async (formData: any) => {
     console.log(formData)
@@ -73,11 +74,6 @@ export const postInsertExternalCalendar = async (formSchema: any) => {
             formSchema.date_end = String(formSchema.jsonArea.date_end)
             formSchema.work_week_type = String(`${Number(formSchema.jsonArea.work_week_type)}-дневная рабочая неделя`)
             formSchema.period = String(formSchema.jsonArea.period)
-            formSchema.calendar_days = Number(formSchema.jsonArea.calendar_days)
-            formSchema.calendar_days_without_holidays = Number(formSchema.jsonArea.calendar_days_without_holidays)
-            formSchema.work_days = Number(formSchema.jsonArea.work_days)
-            formSchema.weekends = Number(formSchema.jsonArea.weekends)
-            formSchema.holidays = Number(formSchema.jsonArea.holidays)
             formSchema.days = formSchema.jsonArea.days
             delete formSchema.jsonArea
             console.log("После форматирования: ", formSchema)
@@ -95,11 +91,13 @@ export const postInsertExternalCalendar = async (formSchema: any) => {
             return response.data
         } else {
             formSchema.work_week_type = String(`${Number(formSchema.work_week_type)}-дневная рабочая неделя`)
-            formSchema.calendar_days = Number(formSchema.calendar_days)
-            formSchema.calendar_days_without_holidays = Number(formSchema.calendar_days_without_holidays)
-            formSchema.work_days = Number(formSchema.work_days)
-            formSchema.weekends = Number(formSchema.weekends)
-            formSchema.holidays = Number(formSchema.holidays)
+            console.log(formSchema)
+            formSchema.days.forEach((day: any) => {
+                let type_id = day.type_id
+                if (type_id === "1") day.type_text = "Рабочий день"
+                else if (type_id === "2") day.type_text = "Выходной день"
+                else if (type_id === "3") day.type_text = "Государственный праздник"
+            });
             const response = await axios.post(
                 `/api/external/insert_production_calendar`,
                 formSchema,
