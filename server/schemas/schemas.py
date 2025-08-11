@@ -232,11 +232,6 @@ class ProductionCalendar(BaseModel):
         date_end (str): Дата последнего дня в календаре
         work_week_type (str): Тип рабочей недели
         period (str): Тип периода
-        calendar_days (Optional[int]): Кол-во календарных дней
-        calendar_days_without_holidays (Optional[int]): Кол-во календарных дней без праздников
-        work_days (Optional[int]): Кол-во рабочих дней
-        weekends (Optional[int]): Кол-во выходных дней
-        holidays (Optional[int]): Кол-во праздничных дней
         days (list[ReadyCalendarDay]): Список готовых дней
         _validate_date_start (@field_validator): Валидатор поля date_start
         _validate_date_end (@field_validator): Валидатор поля date_end
@@ -270,31 +265,6 @@ class ProductionCalendar(BaseModel):
         min_length=3,
         max_length=19,
         description="Тип периода"
-    )
-    calendar_days: Optional[int] = Field(
-        None,
-        ge=0,
-        description="Кол-во календарных дней"
-    )
-    calendar_days_without_holidays: Optional[int] = Field(
-        None,
-        ge=0,
-        description="Кол-во календарных дней без праздников"
-    )
-    work_days: Optional[int] = Field(
-        None,
-        ge=0,
-        description="Кол-во рабочих дней"
-    )
-    weekends: Optional[int] = Field(
-        None,
-        ge=0,
-        description="Кол-во выходных дней"
-    )
-    holidays: Optional[int] = Field(
-        None,
-        ge=0,
-        description="Кол-во праздничных дней"
     )
     days: list[ReadyCalendarDay] = Field(
         ...,

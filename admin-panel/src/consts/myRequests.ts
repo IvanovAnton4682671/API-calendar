@@ -148,41 +148,6 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
             },
             required: true
         },
-        calendar_days: {
-            type: "number",
-            label: "Кол-во дней",
-            placeholder: "Введите кол-во календарных дней",
-            hint: "Опциональное количество календарных дней",
-            required: false
-        },
-        calendar_days_without_holidays: {
-            type: "number",
-            label: "Кол-во дней без праздников",
-            placeholder: "Введите кол-во календарных дней без праздничных дней",
-            hint: "Опциональное количество календарных дней без государственных праздников",
-            required: false
-        },
-        work_days: {
-            type: "number",
-            label: "Кол-во рабочих дней",
-            placeholder: "Введите кол-во рабочих календарных дней",
-            hint: "Опциональное количество рабочих дней",
-            required: false
-        },
-        weekends: {
-            type: "number",
-            label: "Кол-во выходных дней",
-            placeholder: "Введите кол-во выходных календарных дней",
-            hint: "Опциональное количество выходных дней",
-            required: false
-        },
-        holidays: {
-            type: "number",
-            label: "Кол-во праздничных дней",
-            placeholder: "Введите кол-во праздничных календарных дней",
-            hint: "Опциональное количество государственных праздников",
-            required: false
-        },
         days: [
             {
                 date: {
@@ -312,7 +277,7 @@ export const UsingJSONSchema: UsingJSON = {
             type: "textArea",
             label: "Календарь в JSON-формате",
             placeholder: "Введите данные календаря в JSON-формате",
-            hint: 'Пример JSON-календаря:\n{\n"authentication": "Bearer токен",\n"date_start": "01.01.2025",\n"date_end": "10.01.2025",\n"work_week_type": 5,\n"period": "Произвольный период",\n"calendar_days": 10,\n"calendar_days_without_holidays": 2,\n"work_days": 2,\n"weekends": 0,\n"holidays": 8,\n"days": [\n{\n"date": "01.01.2025",\n"type_id": 3,\n"type_text": "Государственный праздник",\n"note": "Новогодние каникулы",\n"week_day": "ср"\n},\n...\n]\n}',
+            hint: 'Пример JSON-календаря:\n{\n"authentication": "Bearer токен",\n"date_start": "01.01.2025",\n"date_end": "02.01.2025",\n"work_week_type": 5,\n"period": "Произвольный период",\n"days": [\n{\n"date": "01.01.2025",\n"type_id": 3,\n"type_text": "Государственный праздник",\n"note": "Новогодние каникулы",\n"week_day": "ср"\n},\n...\n]\n}',
             required: true
         }
     }
