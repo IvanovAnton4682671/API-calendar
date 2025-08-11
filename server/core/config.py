@@ -93,6 +93,12 @@ class Settings(BaseSettings):
         description="URL-адрес hh.ru, который предоставляет данные производственного календаря"
     )
 
+    ADMIN_PANEL_URL: str = Field(
+        ...,
+        min_length=1,
+        description="URL-адрес админ-панели"
+    )
+
     @computed_field
     @property
     def POSTGRESQL_URL(self) -> SecretStr:
