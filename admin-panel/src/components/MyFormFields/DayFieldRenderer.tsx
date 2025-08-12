@@ -4,6 +4,7 @@ import { Box, Flex, Text, Button, Separator } from "@radix-ui/themes"
 import MyTextField from "./MyTextField"
 import MyNumberField from "./MyNumberField"
 import MyRadioField from "./MyRadioField"
+import MyDatePickerField from "./MyDatePickerField"
 import React from "react"
 
 function DayFieldRenderer({ formSchema, dayIndex, delDay, dayData, handleDayChange }:
@@ -64,6 +65,17 @@ function DayFieldRenderer({ formSchema, dayIndex, delDay, dayData, handleDayChan
                                     key={fieldName}
                                     dataReceiver={dayData[fieldName] || Object.keys(field.options)[0] || ""}
                                     onValueChange={(value) => handleDayChange(dayIndex, fieldName, value)}
+                                    field={field}
+                                    size="2"
+                                    name={`${fieldName}-${dayIndex}`}
+                                />
+                            )
+                        case "datePicker":
+                            return(
+                                <MyDatePickerField
+                                    key={fieldName}
+                                    dataReceiver={dayData[fieldName] || ""}
+                                    onChange={(value) => handleDayChange(dayIndex, fieldName, value)}
                                     field={field}
                                     size="2"
                                     name={`${fieldName}-${dayIndex}`}

@@ -42,8 +42,6 @@ export const GetExternalCalendarSchema: FormSchema = {
         year: {
             type: "number",
             label: "Год",
-            placeholder: "Введите год",
-            hint: "Поддерживаемый формат года:\nГГГГ (Пример: 2025)",
             required: true
         },
         week_type: {
@@ -76,10 +74,8 @@ export const PostCreateDaySchema: FormSchema = {
             required: true
         },
         date: {
-            type: "text",
+            type: "datePicker",
             label: "Дата дня",
-            placeholder: "Введите дату дня",
-            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
         type_id: {
@@ -114,17 +110,13 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
             required: true
         },
         date_start: {
-            type: "text",
+            type: "datePicker",
             label: "Дата начала периода",
-            placeholder: "Введите дату начала периода",
-            hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
             required: true
         },
         date_end: {
-            type: "text",
+            type: "datePicker",
             label: "Дата конца периода",
-            placeholder: "Введите дату конца периода",
-            hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
             required: true
         },
         work_week_type: {
@@ -151,10 +143,8 @@ export const PostInsertExternalCalendarSchema: FormSchema = {
         days: [
             {
                 date: {
-                    type: "text",
+                    type: "datePicker",
                     label: "Дата дня",
-                    placeholder: "Введите дату дня",
-                    hint: "Поддерживаемый формат даты:\nДД.ММ.ГГГГ (Пример: 01.01.2025)",
                     required: true
                 },
                 type_id: {
@@ -205,17 +195,13 @@ export const PutUpdateDaySchema: FormSchema = {
             required: true
         },
         old_date: {
-            type: "text",
+            type: "datePicker",
             label: "Дата изменяемого дня",
-            placeholder: "Введите дату изменяемого дня",
-            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
         new_date: {
-            type: "text",
+            type: "datePicker",
             label: "Новая дата дня",
-            placeholder: "Введите новую дату дня",
-            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
         type_id: {
@@ -250,10 +236,8 @@ export const DeleteDaySchema: FormSchema = {
             required: true
         },
         date: {
-            type: "text",
+            type: "datePicker",
             label: "Дата дня",
-            placeholder: "Введите дату дня",
-            hint: "Поддерживаемый формат даты дня:\nГГГГ-ММ-ДД (Пример: 2025-01-01)",
             required: true
         },
     }

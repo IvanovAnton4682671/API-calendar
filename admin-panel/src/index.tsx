@@ -14,9 +14,7 @@ root.render(
       scaling="100%"
       radius="large"
       appearance="dark"
-      panelBackground="solid"
       accentColor="mint"
-      grayColor="gray"
     >
       <App />
     </Theme>

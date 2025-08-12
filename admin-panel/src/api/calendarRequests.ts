@@ -1,5 +1,5 @@
 import axios from "axios"
-import { DayFields } from "../types/formSchemas"
+import { dateParse } from "../utils/dateParse"
 
 export const testSubmit = async (formData: any) => {
     console.log(formData)
@@ -90,13 +90,17 @@ export const postInsertExternalCalendar = async (formSchema: any) => {
             )
             return response.data
         } else {
+            formSchema.date_start = dateParse(formSchema.date_start)
+            formSchema.date_end = dateParse(formSchema.date_end)
             formSchema.work_week_type = String(`${Number(formSchema.work_week_type)}-дневная рабочая неделя`)
-            console.log(formSchema)
             formSchema.days.forEach((day: any) => {
+                //добавление type_text
                 let type_id = day.type_id
                 if (type_id === "1") day.type_text = "Рабочий день"
                 else if (type_id === "2") day.type_text = "Выходной день"
                 else if (type_id === "3") day.type_text = "Государственный праздник"
+                //форматирование даты
+                day.date = dateParse(day.date)
             });
             const response = await axios.post(
                 `/api/external/insert_production_calendar`,

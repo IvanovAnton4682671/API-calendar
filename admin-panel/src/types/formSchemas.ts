@@ -11,8 +11,6 @@ interface TextField extends FieldBase { //текстовое поле
 
 interface NumberField extends FieldBase { //числовое поле
     type: "number"
-    placeholder: string
-    hint: string
 }
 
 interface SwitchField extends FieldBase { //switch-переключатель
@@ -23,6 +21,10 @@ interface SwitchField extends FieldBase { //switch-переключатель
 interface RadioField extends FieldBase { //радио-кнопки
     type: "radio"
     options: Record<string, string>
+}
+
+interface DatePickerField extends FieldBase { //выбор даты
+    type: "datePicker"
 }
 
 interface SelectField extends FieldBase { //select-список
@@ -61,14 +63,14 @@ interface GetExternalCalendar extends BaseSchema { //получение кале
 interface PostCreateDay extends BaseSchema { //создание дня
     fields: {
         authentication: TextField
-        date: TextField
+        date: DatePickerField
         type_id: RadioField
         note: TextField
     }
 }
 
 export interface DayFields { //поля дня для импорта календаря
-    date: TextField
+    date: DatePickerField
     type_id: RadioField
     note?: TextField
     week_day: RadioField
@@ -77,8 +79,8 @@ export interface DayFields { //поля дня для импорта кален�
 export interface PostInsertExternalCalendar extends BaseSchema { //импорт календаря
     fields: {
         authentication: TextField
-        date_start: TextField
-        date_end: TextField
+        date_start: DatePickerField
+        date_end: DatePickerField
         work_week_type: RadioField
         period: SelectField
         days: DayFields[]
@@ -88,8 +90,8 @@ export interface PostInsertExternalCalendar extends BaseSchema { //импорт 
 interface PutUpdateDay extends BaseSchema { //изменение дня
     fields: {
         authentication: TextField
-        old_date: TextField
-        new_date: TextField
+        old_date: DatePickerField
+        new_date: DatePickerField
         type_id: RadioField
         note: TextField
     }
@@ -98,7 +100,7 @@ interface PutUpdateDay extends BaseSchema { //изменение дня
 interface DeleteDay extends BaseSchema { //удаление дня
     fields: {
         authentication: TextField
-        date: TextField
+        date: DatePickerField
     }
 }
 

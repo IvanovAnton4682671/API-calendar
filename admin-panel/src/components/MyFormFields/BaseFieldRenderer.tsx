@@ -4,6 +4,7 @@ import MySwitchField from "./MySwitchField"
 import MyRadioField from "./MyRadioField"
 import MyTextAreaField from "./MyTextAreaField"
 import MySelectField from "./MySelectField"
+import MyDatePickerField from "./MyDatePickerField"
 import React from "react"
 
 function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, handleJSONAreaChange}:
@@ -32,7 +33,7 @@ function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, 
                     <MyNumberField
                         key={fieldName}
                         dataReceiver={formData[fieldName] || ""}
-                        onChange={(e) => handleChange(fieldName, e.target.value)}
+                        onChange={(value) => handleChange(fieldName, value)}
                         field={field}
                         size="3"
                         name={fieldName}
@@ -80,6 +81,17 @@ function BaseFieldRenderer({fieldName, field, formData, jsonData, handleChange, 
                         key={fieldName}
                         dataReceiver={formData[fieldName] || ""}
                         onValueChange={(value) => handleChange(fieldName, value)}
+                        field={field}
+                        size="3"
+                        name={fieldName}
+                    />
+                )
+            case "datePicker":
+                return(
+                    <MyDatePickerField
+                        key={fieldName}
+                        dataReceiver={formData[fieldName] || ""}
+                        onChange={(value) => handleChange(fieldName, value)}
                         field={field}
                         size="3"
                         name={fieldName}
